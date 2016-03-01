@@ -1,0 +1,31 @@
+{
+  "name": "ui.gettext.lang.picker",
+  "version": "0.1.0",
+  "authors": [
+    "Gerasev Kirill <gerasev.kirill@gmail.com>"
+  ],
+  "main": "dist/ui.gettext.lang.picker.min.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-bootstrap": "~1.0.3",
+    "bootstrap": "~3.3.6",
+    "angular": "~1.4.9",
+    "angular-gettext": "~2.2.0",
+    "ui-flags": "https://github.com/gerasev-kirill/ui-flags.git#~0.0.4"
+  },
+  "overrides": {
+    "world-flags-sprite":{
+        "main":[
+            "stylesheets/flags32.css",
+            "stylesheets/flags16.css"
+        ]
+    }
+  }
+}
