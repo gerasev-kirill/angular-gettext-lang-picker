@@ -8,7 +8,7 @@ module.exports = (grunt)->
 			files:{
 				expand: true,
 				cwd: 'dist',
-				src: ['ui.gettext.lang.picker.js'],
+				src: ['ui.gettext.langPicker.js'],
 				dest: 'dist'
 			}
 		},
@@ -18,14 +18,14 @@ module.exports = (grunt)->
 					join: true
 				},
 				files:{
-					'dist/ui.gettext.lang.picker.js':['src/**/*.coffee']
+					'dist/ui.gettext.langPicker.js':['src/**/*.coffee']
 				}
 			}
 		},
 		uglify:{
 			uiGLB:{
 				files:{
-					'dist/ui.gettext.lang.picker.min.js':['dist/ui.gettext.lang.picker.js']
+					'dist/ui.gettext.langPicker.min.js':['dist/ui.gettext.langPicker.js']
 				}
 			}
 		},
@@ -49,7 +49,7 @@ module.exports = (grunt)->
 			files:{
 				cwd: 'dist',
 				expand: true,
-				src: ['*.min.js'],
+				src: ['*.js'],
 				dest: 'dist'
 			}
 		},
@@ -57,7 +57,7 @@ module.exports = (grunt)->
 			files:{
 				cwd: 'dist',
 				expand: true,
-				src: ['ui.gettext.lang.picker.js'],
+				src: ['ui.gettext.langPicker.js'],
 				dest: 'dist'
 			}
 		}
@@ -72,6 +72,8 @@ module.exports = (grunt)->
 
 
 	grunt.registerTask 'default', 'simple-watch'
-	grunt.registerTask 'dist-uglify', ['coffee:compileJoined', 'replace', 
-									   'jade', 'ngAnnotate',
-									   'uglify:uiGLB', 'angular_template_inline_js']
+	grunt.registerTask 'dist-uglify', [
+									'coffee:compileJoined', 'replace',
+									'jade', 'ngAnnotate',
+									'angular_template_inline_js', 'uglify:uiGLB'
+								]

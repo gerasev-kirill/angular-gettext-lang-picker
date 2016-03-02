@@ -1,18 +1,30 @@
 (function() {
   var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-  angular.module('uiGettextLangPicker', ['uiFlag', 'ui.bootstrap']).service('$langPickerConf', ["gettextCatalog", function(gettextCatalog) {
+  angular.module('ui.gettext.langPicker', ['uiFlag', 'ui.bootstrap', 'ui.router']).config(["$provide", function($provide) {
+    return $provide.decorator('$state', ["$delegate", "$langPickerConf", function($delegate, $langPickerConf) {
+      var go, state;
+      state = $delegate;
+      state.baseGo = state.go;
+      go = function(to, params, options) {
+        params.lang = $langPickerConf.currentLang;
+        return this.baseGo(to, params, options);
+      };
+      state.go = go;
+      return $delegate;
+    }]);
+  }]).service('$langPickerConf', ["gettextCatalog", "$location", function(gettextCatalog, $location) {
     this.languageList = [];
     this.currentLang = '';
     this._remote_url = '';
     this._lang_loaded = [];
     this.setCurrentLanguage = (function(_this) {
       return function(lang) {
-        var hash, langs, path, pathname;
+        var hash, langs, path, pathname, ref, ref1;
         if (indexOf.call(Object.keys(_this.languageList), lang) < 0) {
           langs = Object.keys(_this.languageList);
           throw {
-            message: "Unknown lang '" + lang + "'. Allowed are:  " + (langs.join(', ')) + "."
+            message: "Unknown lang '" + lang + "'. Allowed are:  '" + (langs.join(', ')) + "'."
           };
         }
         _this.currentLang = lang;
@@ -24,14 +36,17 @@
         pathname = window.location.pathname;
         hash = window.location.hash;
         path = pathname.split('/');
-        if (path[1] !== lang) {
+        if (path[1] !== lang && (ref = path[1], indexOf.call(_this._lang_loaded, ref) < 0)) {
+          path.splice(1, 0, lang);
+        } else if (ref1 = path[1], indexOf.call(_this._lang_loaded, ref1) >= 0) {
           path[1] = lang;
         }
         pathname = path.join('/');
         if (pathname[pathname.length - 1] === '/') {
           pathname = pathname.substring(0, pathname.length - 1);
         }
-        return history.replaceState('', '', pathname + hash);
+        history.replaceState('', '', pathname + hash);
+        return $location.path(pathname + hash);
       };
     })(this);
     this.setLanguageList = (function(_this) {
@@ -55,7 +70,7 @@
     })(this);
     this.detectLanguage = (function(_this) {
       return function() {
-        var i, l, len, path, pathname, ref, ref1, results;
+        var i, l, len, path, pathname, ref, ref1;
         pathname = window.location.pathname;
         path = pathname.split('/');
         if (path[1] !== '' && (ref = path[1], indexOf.call(Object.keys(_this.languageList), ref) >= 0)) {
@@ -63,18 +78,14 @@
           return;
         }
         ref1 = navigator.languages;
-        results = [];
         for (i = 0, len = ref1.length; i < len; i++) {
           l = ref1[i];
           l = l.split('-')[0];
           if (indexOf.call(Object.keys(_this.languageList), l) >= 0) {
             _this.setCurrentLanguage(l);
             break;
-          } else {
-            results.push(void 0);
           }
         }
-        return results;
       };
     })(this);
     return this;
@@ -99,7 +110,7 @@
           return lang;
         };
       }],
-      templateUrl: '/dist/langPicker.html'
+      template: ('/dist/langPicker.html', '<div uib-dropdown="uib-dropdown" class="btn-group"><button type="button" uib-dropdown-toggle="uib-dropdown-toggle" ng-disabled="ngDisabled" class="btn btn-default"><flag country="{{countryFlagCode($langPickerConf.currentLang)}}"></flag>{{$langPickerConf.getCurrentLanguageName() || \'Language\'}}<span style="margin-left:3px;" class="caret"></span></button><ul uib-dropdown-menu="" role="menu"><li role="menuitem" ng-repeat="(lang_code, lang_name) in $langPickerConf.languageList" ng-click="$langPickerConf.setCurrentLanguage(lang_code)"><a href="javascript: void 0">   <flag country="{{countryFlagCode(lang_code)}}"></flag>{{lang_name}}</a><a href="/{{lang_code}}" style="display:none;"># For google search</a></li></ul></div>' + '')
     };
   }]);
 
