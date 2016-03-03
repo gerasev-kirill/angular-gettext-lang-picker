@@ -75,7 +75,8 @@ angular.module 'ui.gettext.langPicker', ['uiFlag', 'ui.bootstrap', 'ui.router']
             if path[1]!='' and path[1] in Object.keys(@languageList)
                 @setCurrentLanguage(path[1])
                 return
-            for l in navigator.languages
+            languages = window.navigator.languages || [window.navigator.language || window.navigator.userLanguage]
+            for l in languages
                 l = l.split('-')[0]
                 if l in Object.keys(@languageList)
                     @setCurrentLanguage(l)

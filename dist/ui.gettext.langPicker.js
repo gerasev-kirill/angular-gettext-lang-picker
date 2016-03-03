@@ -70,16 +70,16 @@
     })(this);
     this.detectLanguage = (function(_this) {
       return function() {
-        var i, l, len, path, pathname, ref, ref1;
+        var i, l, languages, len, path, pathname, ref;
         pathname = window.location.pathname;
         path = pathname.split('/');
         if (path[1] !== '' && (ref = path[1], indexOf.call(Object.keys(_this.languageList), ref) >= 0)) {
           _this.setCurrentLanguage(path[1]);
           return;
         }
-        ref1 = navigator.languages;
-        for (i = 0, len = ref1.length; i < len; i++) {
-          l = ref1[i];
+        languages = window.navigator.languages || [window.navigator.language || window.navigator.userLanguage];
+        for (i = 0, len = languages.length; i < len; i++) {
+          l = languages[i];
           l = l.split('-')[0];
           if (indexOf.call(Object.keys(_this.languageList), l) >= 0) {
             _this.setCurrentLanguage(l);
