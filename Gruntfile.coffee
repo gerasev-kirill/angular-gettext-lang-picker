@@ -72,7 +72,7 @@ module.exports = (grunt)->
 
 
 	grunt.registerTask 'default', 'simple-watch'
-	grunt.registerTask 'dist-uglify', [
+	grunt.registerTask 'build', [
 									'coffee:compileJoined', 'replace',
 									'jade', 'ngAnnotate',
 									'angular_template_inline_js', 'uglify:uiGLB'

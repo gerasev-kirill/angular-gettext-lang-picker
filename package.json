@@ -1,11 +1,13 @@
 {
   "name": "uiGettextLangPicker",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "main": "",
   "scripts": {
     "grunt": "grunt"
   },
-  "dependencies": {},
+  "dependencies": {
+    "grunt": "^1.0.1"
+  },
   "devDependencies": {
     "angular-template-inline-js": "^0.1.6",
     "grunt-angular-template-inline-js": "^0.1.1",

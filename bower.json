@@ -14,11 +14,11 @@
     "tests"
   ],
   "dependencies": {
-    "angular-bootstrap": "~1.0.3",
-    "bootstrap": "~3.3.6",
-    "angular": "~1.4.9",
-    "angular-gettext": "~2.2.0",
-    "angular-ui-router": "~0.2.18",
+    "angular-bootstrap": "~1.x",
+    "bootstrap": "~3.x",
+    "angular": "~1.x",
+    "angular-gettext": "~2.x",
+    "angular-ui-router": "~0.2.x",
     "ui-flags": "https://github.com/gerasev-kirill/ui-flags.git#~0.0.4"
   },
   "overrides": {

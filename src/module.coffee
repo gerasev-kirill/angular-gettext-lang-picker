@@ -10,6 +10,7 @@ angular.module 'ui.gettext.langPicker', ['uiFlag', 'ui.bootstrap', 'ui.router']
         # Decorate the original 'go' to always plug in the userID
 
         go = (to, params, options) ->
+            params = params  or  {}
             params.lang = $langPickerConf.currentLang
             # Invoke the original go
             @baseGo(to, params, options)
@@ -51,8 +52,8 @@ angular.module 'ui.gettext.langPicker', ['uiFlag', 'ui.bootstrap', 'ui.router']
             if pathname[pathname.length-1]=='/'
                 pathname = pathname.substring(0, pathname.length-1)
 
-            history.replaceState('', '', pathname+hash)
-            $location.path(pathname+hash)
+            #history.replaceState('', '', pathname+hash)
+            #$location.path(pathname+hash)
 
 
         @setLanguageList = (list)=>

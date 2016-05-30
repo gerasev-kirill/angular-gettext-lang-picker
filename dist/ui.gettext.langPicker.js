@@ -7,6 +7,7 @@
       state = $delegate;
       state.baseGo = state.go;
       go = function(to, params, options) {
+        params = params || {};
         params.lang = $langPickerConf.currentLang;
         return this.baseGo(to, params, options);
       };
@@ -43,10 +44,8 @@
         }
         pathname = path.join('/');
         if (pathname[pathname.length - 1] === '/') {
-          pathname = pathname.substring(0, pathname.length - 1);
+          return pathname = pathname.substring(0, pathname.length - 1);
         }
-        history.replaceState('', '', pathname + hash);
-        return $location.path(pathname + hash);
       };
     })(this);
     this.setLanguageList = (function(_this) {
