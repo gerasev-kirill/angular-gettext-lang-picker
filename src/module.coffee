@@ -34,6 +34,8 @@ angular.module 'ui.gettext.langPicker', ['uiFlag', 'ui.bootstrap', 'ui.router']
                     message: "Unknown lang '#{lang}'. Allowed are:  '#{langs.join(', ')}'."
                 }
             @currentLang = lang
+            window.currentLang = lang
+            
             if lang not in @_lang_loaded
                 gettextCatalog.loadRemote(@_remote_url + lang + ".json")
                 @_lang_loaded.push(lang)

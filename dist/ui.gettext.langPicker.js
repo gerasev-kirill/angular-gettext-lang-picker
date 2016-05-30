@@ -29,6 +29,7 @@
           };
         }
         _this.currentLang = lang;
+        window.currentLang = lang;
         if (indexOf.call(_this._lang_loaded, lang) < 0) {
           gettextCatalog.loadRemote(_this._remote_url + lang + ".json");
           _this._lang_loaded.push(lang);
