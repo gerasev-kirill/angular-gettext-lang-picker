@@ -5,11 +5,12 @@
         | {{$langPickerConf.getCurrentLanguageName() || 'Language'}}
         span.caret(style="margin-left:3px;")
     ul(uib-dropdown-menu="", role="menu")
-        li(role="menuitem", ng-repeat="(lang_code, lang_name) in $langPickerConf.languageList",
-                ng-click="$langPickerConf.setCurrentLanguage(lang_code)")
+        li( role="menuitem", 
+            ng-repeat="(lang_code, lang_name) in $langPickerConf.languageList",
+            ng-click="$langPickerConf.setCurrentLanguage(lang_code)"
+            ng-class="{'active': lang_code==$langPickerConf.currentLang}"
+        )
                 
             a(href="javascript: void 0")    
                 flag(country="{{countryFlagCode(lang_code)}}")
                 | {{lang_name}}
-            
-            a(href="/{{lang_code}}", style="display:none;") # For google search

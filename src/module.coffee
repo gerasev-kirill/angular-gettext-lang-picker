@@ -7,8 +7,8 @@ angular.module 'ui.gettext.langPicker', ['uiFlag', 'ui.bootstrap', 'ui.router']
         state = $delegate
         # Save off reference to original state.go
         state.baseGo = state.go
-        # Decorate the original 'go' to always plug in the userID
 
+        # Decorate the original 'go'
         go = (to, params, options) ->
             params = params  or  {}
             params.lang = $langPickerConf.currentLang
@@ -21,7 +21,7 @@ angular.module 'ui.gettext.langPicker', ['uiFlag', 'ui.bootstrap', 'ui.router']
 
 
 .service '$langPickerConf',
-    (gettextCatalog, $location) ->
+    (gettextCatalog, $injector) ->
         @languageList = []
         @currentLang = ''
         @_remote_url = ''
@@ -35,27 +35,43 @@ angular.module 'ui.gettext.langPicker', ['uiFlag', 'ui.bootstrap', 'ui.router']
                 }
             @currentLang = lang
             window.currentLang = lang
-            
+
             if lang not in @_lang_loaded
                 gettextCatalog.loadRemote(@_remote_url + lang + ".json")
                 @_lang_loaded.push(lang)
             gettextCatalog.setCurrentLanguage(lang)
 
-            pathname = window.location.pathname
-            hash = window.location.hash
-            path = pathname.split('/')
+            # перегружаем состояние приложения
+            try
+                # возникают циклические зависимости если мы инжектим $state
+                # прямо в сервис
+                $state = $injector.get('$state')
+                params = $state.params or {}
+                params.lang = lang
+                $state.go(
+                    $state.current.name,
+                    params,
+                    {notify:false, reload:false}
+                )
+            catch error
+                # ui-router не подключен. меняем url по старому с перезагрузкой
+                # состояния
+                $location = $injector.get('$location')
+                pathname = window.location.pathname
+                hash = window.location.hash
+                path = pathname.split('/')
 
-            if path[1] != lang and path[1] not in @_lang_loaded
-                path.splice(1, 0, lang)
-            else if path[1] in @_lang_loaded
-                path[1] = lang
+                if path[1] != lang and path[1] not in @_lang_loaded
+                    path.splice(1, 0, lang)
+                else if path[1] in @_lang_loaded
+                    path[1] = lang
 
-            pathname = path.join('/')
-            if pathname[pathname.length-1]=='/'
-                pathname = pathname.substring(0, pathname.length-1)
+                pathname = path.join('/')
+                if pathname[pathname.length-1]=='/'
+                    pathname = pathname.substring(0, pathname.length-1)
 
-            #history.replaceState('', '', pathname+hash)
-            #$location.path(pathname+hash)
+                history.replaceState('', '', pathname+hash)
+                $location.path(pathname+hash)
 
 
         @setLanguageList = (list)=>

@@ -14,14 +14,14 @@
       state.go = go;
       return $delegate;
     }]);
-  }]).service('$langPickerConf', ["gettextCatalog", "$location", function(gettextCatalog, $location) {
+  }]).service('$langPickerConf', ["gettextCatalog", "$injector", function(gettextCatalog, $injector) {
     this.languageList = [];
     this.currentLang = '';
     this._remote_url = '';
     this._lang_loaded = [];
     this.setCurrentLanguage = (function(_this) {
       return function(lang) {
-        var hash, langs, path, pathname, ref, ref1;
+        var $location, $state, error, hash, langs, params, path, pathname, ref, ref1;
         if (indexOf.call(Object.keys(_this.languageList), lang) < 0) {
           langs = Object.keys(_this.languageList);
           throw {
@@ -35,17 +35,31 @@
           _this._lang_loaded.push(lang);
         }
         gettextCatalog.setCurrentLanguage(lang);
-        pathname = window.location.pathname;
-        hash = window.location.hash;
-        path = pathname.split('/');
-        if (path[1] !== lang && (ref = path[1], indexOf.call(_this._lang_loaded, ref) < 0)) {
-          path.splice(1, 0, lang);
-        } else if (ref1 = path[1], indexOf.call(_this._lang_loaded, ref1) >= 0) {
-          path[1] = lang;
-        }
-        pathname = path.join('/');
-        if (pathname[pathname.length - 1] === '/') {
-          return pathname = pathname.substring(0, pathname.length - 1);
+        try {
+          $state = $injector.get('$state');
+          params = $state.params || {};
+          params.lang = lang;
+          return $state.go($state.current.name, params, {
+            notify: false,
+            reload: false
+          });
+        } catch (_error) {
+          error = _error;
+          $location = $injector.get('$location');
+          pathname = window.location.pathname;
+          hash = window.location.hash;
+          path = pathname.split('/');
+          if (path[1] !== lang && (ref = path[1], indexOf.call(_this._lang_loaded, ref) < 0)) {
+            path.splice(1, 0, lang);
+          } else if (ref1 = path[1], indexOf.call(_this._lang_loaded, ref1) >= 0) {
+            path[1] = lang;
+          }
+          pathname = path.join('/');
+          if (pathname[pathname.length - 1] === '/') {
+            pathname = pathname.substring(0, pathname.length - 1);
+          }
+          history.replaceState('', '', pathname + hash);
+          return $location.path(pathname + hash);
         }
       };
     })(this);
@@ -110,7 +124,7 @@
           return lang;
         };
       }],
-      template: ('/dist/langPicker.html', '<div uib-dropdown="uib-dropdown" class="btn-group"><button type="button" uib-dropdown-toggle="uib-dropdown-toggle" ng-disabled="ngDisabled" class="btn btn-default"><flag country="{{countryFlagCode($langPickerConf.currentLang)}}"></flag>{{$langPickerConf.getCurrentLanguageName() || \'Language\'}}<span style="margin-left:3px;" class="caret"></span></button><ul uib-dropdown-menu="" role="menu"><li role="menuitem" ng-repeat="(lang_code, lang_name) in $langPickerConf.languageList" ng-click="$langPickerConf.setCurrentLanguage(lang_code)"><a href="javascript: void 0">   <flag country="{{countryFlagCode(lang_code)}}"></flag>{{lang_name}}</a><a href="/{{lang_code}}" style="display:none;"># For google search</a></li></ul></div>' + '')
+      template: ('/dist/langPicker.html', '<div uib-dropdown="uib-dropdown" class="btn-group"><button type="button" uib-dropdown-toggle="uib-dropdown-toggle" ng-disabled="ngDisabled" class="btn btn-default"><flag country="{{countryFlagCode($langPickerConf.currentLang)}}"></flag>{{$langPickerConf.getCurrentLanguageName() || \'Language\'}}<span style="margin-left:3px;" class="caret"></span></button><ul uib-dropdown-menu="" role="menu"><li role="menuitem" ng-repeat="(lang_code, lang_name) in $langPickerConf.languageList" ng-click="$langPickerConf.setCurrentLanguage(lang_code)" ng-class="{\'active\': lang_code==$langPickerConf.currentLang}"><a href="javascript: void 0">   <flag country="{{countryFlagCode(lang_code)}}"></flag>{{lang_name}}</a></li></ul></div>' + '')
     };
   }]);
 
