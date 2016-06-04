@@ -17,6 +17,21 @@ angular.module 'ui.gettext.langPicker', ['uiFlag', 'ui.bootstrap', 'ui.router']
 
         # assign new 'go', decorating the old 'go'
         state.go = go
+
+        # оборачиваем также и вызов href.
+        # если переменная lang не определена, то url будет сгенерирован
+        # такого вида "//my/state" что не даст браузеру нормально открывать
+        # ссылки по щелчку средней кнопки.
+        state.baseHref = state.href;
+        href = (stateOrName, params, options)->
+            params = params  or  {}
+            url = @baseHref(stateOrName, params, options)
+            if not params.lang  and  url
+                url = url.replace('//', '/')
+            url
+
+        state.href = href
+
         $delegate
 
 

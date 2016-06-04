@@ -3,7 +3,7 @@
 
   angular.module('ui.gettext.langPicker', ['uiFlag', 'ui.bootstrap', 'ui.router']).config(["$provide", function($provide) {
     return $provide.decorator('$state', ["$delegate", "$langPickerConf", function($delegate, $langPickerConf) {
-      var go, state;
+      var go, href, state;
       state = $delegate;
       state.baseGo = state.go;
       go = function(to, params, options) {
@@ -12,6 +12,17 @@
         return this.baseGo(to, params, options);
       };
       state.go = go;
+      state.baseHref = state.href;
+      href = function(stateOrName, params, options) {
+        var url;
+        params = params || {};
+        url = this.baseHref(stateOrName, params, options);
+        if (!params.lang && url) {
+          url = url.replace('//', '/');
+        }
+        return url;
+      };
+      state.href = href;
       return $delegate;
     }]);
   }]).service('$langPickerConf', ["gettextCatalog", "$injector", function(gettextCatalog, $injector) {
