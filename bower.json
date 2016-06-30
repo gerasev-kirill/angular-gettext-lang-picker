@@ -18,8 +18,8 @@
     "bootstrap": "~3.x",
     "angular": "~1.x",
     "angular-gettext": "~2.x",
-    "angular-ui-router": "~0.2.x",
-    "ui-flags": "https://github.com/gerasev-kirill/ui-flags.git#~0.0.4"
+    "angular-ui-router": "~0.3.x",
+    "ui-flags": "https://github.com/gerasev-kirill/ui-flags.git#~0.5.0"
   },
   "overrides": {
     "world-flags-sprite":{
