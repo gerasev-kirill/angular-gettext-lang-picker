@@ -61,6 +61,8 @@ angular.module 'ui.gettext.langPicker', ['uiFlag', 'ui.bootstrap', 'ui.router']
                 # возникают циклические зависимости если мы инжектим $state
                 # прямо в сервис
                 $state = $injector.get('$state')
+                if !$state.current.name
+                    return
                 params = $state.params or {}
                 params.lang = lang
                 $state.go(

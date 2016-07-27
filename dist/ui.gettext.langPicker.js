@@ -48,6 +48,9 @@
         gettextCatalog.setCurrentLanguage(lang);
         try {
           $state = $injector.get('$state');
+          if (!$state.current.name) {
+            return;
+          }
           params = $state.params || {};
           params.lang = lang;
           return $state.go($state.current.name, params, {
