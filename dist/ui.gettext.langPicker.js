@@ -140,6 +140,30 @@
       }],
       template: ('/dist/langPicker.html', '<div uib-dropdown="uib-dropdown" class="btn-group"><button type="button" uib-dropdown-toggle="uib-dropdown-toggle" ng-disabled="ngDisabled" class="btn btn-default"><flag country="{{countryFlagCode($langPickerConf.currentLang)}}"></flag>{{$langPickerConf.getCurrentLanguageName() || \'Language\'}}<span style="margin-left:3px;" class="caret"></span></button><ul uib-dropdown-menu="" role="menu"><li role="menuitem" ng-repeat="(lang_code, lang_name) in $langPickerConf.languageList" ng-click="$langPickerConf.setCurrentLanguage(lang_code)" ng-class="{\'active\': lang_code==$langPickerConf.currentLang}"><a href="javascript: void 0">   <flag country="{{countryFlagCode(lang_code)}}"></flag>{{lang_name}}</a></li></ul></div>' + '')
     };
+  }]).directive('langPickerForNavbar', ["$langPickerConf", function($langPickerConf) {
+    return {
+      restrict: 'A',
+      replace: true,
+      scope: {
+        "default": '=?',
+        ngDisabled: '=?'
+      },
+      controller: ["$scope", function($scope) {
+        $scope.$langPickerConf = $langPickerConf;
+        if ($scope["default"]) {
+          $langPickerConf.setCurrentLanguage($scope["default"]);
+        } else {
+          $langPickerConf.detectLanguage();
+        }
+        return $scope.countryFlagCode = function(lang) {
+          if (lang === 'en') {
+            return 'gb';
+          }
+          return lang;
+        };
+      }],
+      template: ('/dist/langPickerForNavbar.html', '<li uib-dropdown="" class="dropdown"><a uib-dropdown-toggle="" style="cursor:pointer;" class="dropdown-toggle"><flag country="{{countryFlagCode($langPickerConf.currentLang)}}"></flag>{{$langPickerConf.getCurrentLanguageName() || \'Language\'}}<span style="margin-left:3px;" class="caret"></span></a><ul uib-dropdown-menu="" role="menu" class="dropdown-menu"><li role="menuitem" ng-repeat="(lang_code, lang_name) in $langPickerConf.languageList" ng-click="$langPickerConf.setCurrentLanguage(lang_code)" ng-class="{\'active\': lang_code==$langPickerConf.currentLang}"><a href="javascript: void 0">   <flag country="{{countryFlagCode(lang_code)}}"></flag>{{lang_name}}</a></li></ul></li>' + '')
+    };
   }]);
 
 }).call(this);

@@ -144,3 +144,28 @@ angular.module 'ui.gettext.langPicker', ['uiFlag', 'ui.bootstrap', 'ui.router']
 
 
         templateUrl: '/@@__SOURCE_PATH__/langPicker.html'
+
+
+
+
+.directive 'langPickerForNavbar',
+    ($langPickerConf) ->
+        restrict: 'A'
+        replace: true
+        scope:{
+            default: '=?',
+            ngDisabled: '=?'
+        }
+        controller: ($scope) ->
+            $scope.$langPickerConf = $langPickerConf
+            if $scope.default
+                $langPickerConf.setCurrentLanguage($scope.default)
+            else
+                $langPickerConf.detectLanguage()
+
+            $scope.countryFlagCode = (lang) ->
+                if lang=='en' then return 'gb'
+                lang
+
+
+        templateUrl: '/@@__SOURCE_PATH__/langPickerForNavbar.html'

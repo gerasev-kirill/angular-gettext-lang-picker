@@ -38,7 +38,8 @@ module.exports = (grunt)->
 		jade: {
 			compile: {
 				files: {
-					"dist/langPicker.html": "src/langPicker.jade"
+					"dist/langPicker.html": "src/langPicker.jade",
+					"dist/langPickerForNavbar.html": "src/langPickerForNavbar.jade"
 				}
 			}
 		},
