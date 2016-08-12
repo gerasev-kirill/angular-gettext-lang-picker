@@ -8,7 +8,7 @@ Docs: https://gerasev-kirill.github.io/ui.gettext.langPicker/doc
 ## Installation
 
 ```bash
-bower install --save ui.gettext.langPicker
+bower install --save ui.gettext.langpicker
 ```
 
 
