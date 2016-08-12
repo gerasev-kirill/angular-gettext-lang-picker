@@ -1,17 +1,18 @@
 {
   "name": "uiGettextLangPicker",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "main": "",
   "scripts": {
     "grunt": "grunt"
   },
   "dependencies": {
-    "grunt": "^1.0.1"
   },
   "devDependencies": {
+    "grunt": "^1.0.1",
     "angular-template-inline-js": "^0.1.6",
     "grunt-angular-template-inline-js": "^0.1.1",
     "grunt-contrib-coffee": "^0.13.0",
+    "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-jade": "^0.15.0",
     "grunt-contrib-uglify": "^0.11.0",
     "grunt-ng-annotate": "^1.0.1",
@@ -22,5 +23,5 @@
     "type": "",
     "url": ""
   },
-  "description": "language change button"
+  "description": "gettext angular language change button"
 }

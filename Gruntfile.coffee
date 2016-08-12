@@ -1,45 +1,67 @@
 module.exports = (grunt)->
 
+	generateFilePattern = (dirs)->
+		list=[]
+		for d in dirs
+			if '*' in d or d.indexOf('.js')>-1
+				list.push(d)
+				continue
+			list.push("#{d}/**/module*.js")
+			list.push("#{d}/**/!(module*)*.js")
+		console.log list
+		list
 
 	grunt.initConfig {
 		pkg: grunt.file.readJSON('package.json'),
 		replace: {
-			options:{},
-			files:{
-				expand: true,
-				cwd: 'dist',
-				src: ['ui.gettext.langPicker.js'],
-				dest: 'dist'
+			src:{
+				options:{},
+				files:[{
+						expand: true,
+						cwd: 'src',
+						src: ['**/*.js', '**/*.html'],
+						dest: 'src',
+					}]
 			}
 		},
 		coffee:{
-			compileJoined: {
-				options:{
-					join: true
-				},
-				files:{
-					'dist/ui.gettext.langPicker.js':['src/**/*.coffee']
+			compile:{
+				glob_to_multiple: {
+					expand: true,
+					cwd: 'src',
+					src: ['**/*.coffee'],
+					dest: 'src',
+					ext: '.js'
 				}
 			}
 		},
+		concat:{
+			dist:{
+				src: generateFilePattern(['src']),
+				dest: 'dist/ui.gettext.langPicker.js'
+			}
+		},
 		uglify:{
-			uiGLB:{
+			src:{
 				files:{
-					'dist/ui.gettext.langPicker.min.js':['dist/ui.gettext.langPicker.js']
+					'dist/ui.gettext.langPicker.min.js': 'dist/ui.gettext.langPicker.js'
 				}
 			}
 		},
 		watch:{
 			scripts:{
-				files: ['src/**/*.js', 'dist/**/*.js' ],
+				files: ['src/**/*.js', 'src/**/*.html'],
 				tasks: ['replace']
 			}
 		},
 		jade: {
 			compile: {
-				files: {
-					"dist/langPicker.html": "src/langPicker.jade",
-					"dist/langPickerForNavbar.html": "src/langPickerForNavbar.jade"
+				glob_to_multiple: {
+					expand: true,
+					cwd: 'src',
+					src: ['**/*.jade'],
+					dest: 'src',
+					ext: '.html'
 				}
 			}
 		},
@@ -48,18 +70,18 @@ module.exports = (grunt)->
 				basePath: __dirname
 			},
 			files:{
-				cwd: 'dist',
+				cwd: 'src',
 				expand: true,
-				src: ['*.js'],
-				dest: 'dist'
+				src: ['**/*.js'],
+				dest: 'src'
 			}
 		},
 		ngAnnotate: {
 			files:{
-				cwd: 'dist',
 				expand: true,
-				src: ['ui.gettext.langPicker.js'],
-				dest: 'dist'
+				cwd: 'src',
+				src: ['**/*.js'],
+				dest: 'src'
 			}
 		}
 	}
@@ -70,11 +92,17 @@ module.exports = (grunt)->
 	grunt.loadNpmTasks 'grunt-contrib-jade'
 	grunt.loadNpmTasks 'grunt-angular-template-inline-js'
 	grunt.loadNpmTasks 'grunt-ng-annotate'
+	grunt.loadNpmTasks 'grunt-contrib-concat'
 
 
 	grunt.registerTask 'default', 'simple-watch'
-	grunt.registerTask 'build', [
-									'coffee:compileJoined', 'replace',
-									'jade', 'ngAnnotate',
-									'angular_template_inline_js', 'uglify:uiGLB'
-								]
+
+	grunt.registerTask 'dist', [
+			'coffee:compile',
+			'replace:src',
+			'jade:compile',
+			'angular_template_inline_js',
+			'ngAnnotate',
+			'concat:dist',
+			'uglify:src'
+	]

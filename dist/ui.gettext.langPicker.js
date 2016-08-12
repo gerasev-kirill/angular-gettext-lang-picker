@@ -1,14 +1,145 @@
 (function() {
-  var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  angular.module('ui.gettext.langPicker', ['uiFlag', 'ui.bootstrap', 'ui.router']);
 
-  angular.module('ui.gettext.langPicker', ['uiFlag', 'ui.bootstrap', 'ui.router']).config(["$provide", function($provide) {
-    return $provide.decorator('$state', ["$delegate", "$langPickerConf", function($delegate, $langPickerConf) {
+}).call(this);
+
+(function() {
+  angular.module('ui.gettext.langPicker').directive('uiLangPicker', ["$langPicker", function($langPicker) {
+    return {
+      restrict: 'E',
+      scope: {
+        "default": '=?',
+        ngDisabled: '=?'
+      },
+      controller: ["$scope", function($scope) {
+        $scope.$langPicker = $langPicker;
+        if (!$langPicker.currentLang) {
+          $langPicker.detectLanguage();
+        }
+        return $scope.countryFlagCode = function(lang) {
+          if (lang === 'en') {
+            return 'gb';
+          }
+          return lang;
+        };
+      }],
+      template: ('/src/_directives/uiLangPicker/uiLangPicker.html', '\n<div uib-dropdown="uib-dropdown" class="btn-group">\n  <button type="button" uib-dropdown-toggle="uib-dropdown-toggle" ng-disabled="ngDisabled" class="btn btn-default">\n    <flag country="{{countryFlagCode($langPicker.currentLang)}}"></flag>{{$langPicker.getCurrentLanguageName() || \'Language\'}}<span style="margin-left:3px;" class="caret"></span>\n  </button>\n  <ul uib-dropdown-menu="" role="menu">\n    <li role="menuitem" ng-repeat="(lang_code, lang_name) in $langPicker.languageList" ng-click="$langPicker.setCurrentLanguage(lang_code)" ng-class="{\'active\': lang_code==$langPicker.currentLang}"><a href="javascript: void 0">   \n        <flag country="{{countryFlagCode(lang_code)}}"></flag>{{lang_name}}</a></li>\n  </ul>\n</div>' + '')
+    };
+  }]);
+
+}).call(this);
+
+(function() {
+  angular.module('ui.gettext.langPicker').directive('uiLangPickerForNavbar', ["$langPicker", function($langPicker) {
+    return {
+      restrict: 'A',
+      replace: true,
+      link: function($scope, $element, attrs) {
+        $scope.$langPicker = $langPicker;
+        $scope.attrs = attrs;
+        if (!$langPicker.currentLang) {
+          $langPicker.detectLanguage();
+        }
+        return $scope.countryFlagCode = function(lang) {
+          if (lang === 'en') {
+            return 'gb';
+          }
+          return lang;
+        };
+      },
+      template: ('/src/_directives/uiLangPickerForNavbar/uiLangPickerForNavbar.html', '\n<li uib-dropdown="" class="dropdown"><a uib-dropdown-toggle="" style="cursor:pointer;" ng-disabled="attrs.disabled" class="dropdown-toggle">\n    <flag country="{{countryFlagCode($langPicker.currentLang)}}"></flag>{{$langPicker.getCurrentLanguageName() || \'Language\'}}<span style="margin-left:3px;" class="caret"></span></a>\n  <ul uib-dropdown-menu="" role="menu" class="dropdown-menu">\n    <li role="menuitem" ng-repeat="(lang_code, lang_name) in $langPicker.languageList" ng-click="$langPicker.setCurrentLanguage(lang_code)" ng-class="{\'active\': lang_code==$langPicker.currentLang}"><a href="javascript: void 0">   \n        <flag country="{{countryFlagCode(lang_code)}}"></flag>{{lang_name}}</a></li>\n  </ul>\n</li>' + '')
+    };
+  }]);
+
+}).call(this);
+
+(function() {
+  var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+  angular.module('ui.gettext.langPicker').service('$langPicker', ["$injector", "gettextCatalog", function($injector, gettextCatalog) {
+    this._lang_loaded = [];
+    this.languageList = [];
+    this.remoteCatalogUrl = '';
+    this.currentLang = '';
+    this.setCurrentLanguage = (function(_this) {
+      return function(lang) {
+        var $state, langs, params;
+        if (__indexOf.call(Object.keys(_this.languageList), lang) < 0) {
+          langs = Object.keys(_this.languageList);
+          throw {
+            message: "Unknown lang '" + lang + "'. Allowed are:  '" + (langs.join(', ')) + "'."
+          };
+        }
+        _this.currentLang = lang;
+        if (__indexOf.call(_this._lang_loaded, lang) < 0) {
+          gettextCatalog.loadRemote(_this.remoteCatalogUrl + lang + ".json");
+          _this._lang_loaded.push(lang);
+        }
+        gettextCatalog.setCurrentLanguage(lang);
+        $state = $injector.get('$state');
+        if (!$state.current.name) {
+          return;
+        }
+        params = $state.params || {};
+        params.lang = lang;
+        return $state.go($state.current.name, params, {
+          notify: false,
+          reload: false
+        });
+      };
+    })(this);
+    this.setLanguageList = (function(_this) {
+      return function(list) {
+        return _this.languageList = angular.copy(list);
+      };
+    })(this);
+    this.setLanguageRemoteUrl = (function(_this) {
+      return function(url) {
+        return _this.remoteCatalogUrl = angular.copy(url);
+      };
+    })(this);
+    this.getCurrentLanguageName = (function(_this) {
+      return function() {
+        var _ref;
+        if (_ref = _this.currentLang, __indexOf.call(Object.keys(_this.languageList), _ref) < 0) {
+          return '';
+        }
+        return _this.languageList[_this.currentLang];
+      };
+    })(this);
+    this.detectLanguage = (function(_this) {
+      return function() {
+        var $state, l, languages, params, _i, _len;
+        $state = $injector.get('$state');
+        params = $state.params || {};
+        if (params.lang) {
+          return _this.setCurrentLanguage(params.lang);
+        }
+        languages = window.navigator.languages || [window.navigator.language || window.navigator.userLanguage];
+        for (_i = 0, _len = languages.length; _i < _len; _i++) {
+          l = languages[_i];
+          l = l.split('-')[0];
+          if (__indexOf.call(Object.keys(_this.languageList), l) >= 0) {
+            _this.setCurrentLanguage(l);
+            break;
+          }
+        }
+      };
+    })(this);
+    return this;
+  }]);
+
+}).call(this);
+
+(function() {
+  angular.module('ui.gettext.langPicker').config(["$provide", function($provide) {
+    return $provide.decorator('$state', ["$delegate", "$langPicker", function($delegate, $langPicker) {
       var go, href, state;
       state = $delegate;
       state.baseGo = state.go;
       go = function(to, params, options) {
         params = params || {};
-        params.lang = $langPickerConf.currentLang;
+        params.lang = $langPicker.currentLang;
         return this.baseGo(to, params, options);
       };
       state.go = go;
@@ -25,145 +156,6 @@
       state.href = href;
       return $delegate;
     }]);
-  }]).service('$langPickerConf', ["gettextCatalog", "$injector", function(gettextCatalog, $injector) {
-    this.languageList = [];
-    this.currentLang = '';
-    this._remote_url = '';
-    this._lang_loaded = [];
-    this.setCurrentLanguage = (function(_this) {
-      return function(lang) {
-        var $location, $state, error, hash, langs, params, path, pathname, ref, ref1;
-        if (indexOf.call(Object.keys(_this.languageList), lang) < 0) {
-          langs = Object.keys(_this.languageList);
-          throw {
-            message: "Unknown lang '" + lang + "'. Allowed are:  '" + (langs.join(', ')) + "'."
-          };
-        }
-        _this.currentLang = lang;
-        window.currentLang = lang;
-        if (indexOf.call(_this._lang_loaded, lang) < 0) {
-          gettextCatalog.loadRemote(_this._remote_url + lang + ".json");
-          _this._lang_loaded.push(lang);
-        }
-        gettextCatalog.setCurrentLanguage(lang);
-        try {
-          $state = $injector.get('$state');
-          if (!$state.current.name) {
-            return;
-          }
-          params = $state.params || {};
-          params.lang = lang;
-          return $state.go($state.current.name, params, {
-            notify: false,
-            reload: false
-          });
-        } catch (_error) {
-          error = _error;
-          $location = $injector.get('$location');
-          pathname = window.location.pathname;
-          hash = window.location.hash;
-          path = pathname.split('/');
-          if (path[1] !== lang && (ref = path[1], indexOf.call(_this._lang_loaded, ref) < 0)) {
-            path.splice(1, 0, lang);
-          } else if (ref1 = path[1], indexOf.call(_this._lang_loaded, ref1) >= 0) {
-            path[1] = lang;
-          }
-          pathname = path.join('/');
-          if (pathname[pathname.length - 1] === '/') {
-            pathname = pathname.substring(0, pathname.length - 1);
-          }
-          history.replaceState('', '', pathname + hash);
-          return $location.path(pathname + hash);
-        }
-      };
-    })(this);
-    this.setLanguageList = (function(_this) {
-      return function(list) {
-        return _this.languageList = angular.copy(list);
-      };
-    })(this);
-    this.setLanguageRemoteUrl = (function(_this) {
-      return function(url) {
-        return _this._remote_url = angular.copy(url);
-      };
-    })(this);
-    this.getCurrentLanguageName = (function(_this) {
-      return function() {
-        var ref;
-        if (ref = _this.currentLang, indexOf.call(Object.keys(_this.languageList), ref) < 0) {
-          return '';
-        }
-        return _this.languageList[_this.currentLang];
-      };
-    })(this);
-    this.detectLanguage = (function(_this) {
-      return function() {
-        var i, l, languages, len, path, pathname, ref;
-        pathname = window.location.pathname;
-        path = pathname.split('/');
-        if (path[1] !== '' && (ref = path[1], indexOf.call(Object.keys(_this.languageList), ref) >= 0)) {
-          _this.setCurrentLanguage(path[1]);
-          return;
-        }
-        languages = window.navigator.languages || [window.navigator.language || window.navigator.userLanguage];
-        for (i = 0, len = languages.length; i < len; i++) {
-          l = languages[i];
-          l = l.split('-')[0];
-          if (indexOf.call(Object.keys(_this.languageList), l) >= 0) {
-            _this.setCurrentLanguage(l);
-            break;
-          }
-        }
-      };
-    })(this);
-    return this;
-  }]).directive('langPicker', ["$langPickerConf", function($langPickerConf) {
-    return {
-      restrict: 'E',
-      scope: {
-        "default": '=?',
-        ngDisabled: '=?'
-      },
-      controller: ["$scope", function($scope) {
-        $scope.$langPickerConf = $langPickerConf;
-        if ($scope["default"]) {
-          $langPickerConf.setCurrentLanguage($scope["default"]);
-        } else {
-          $langPickerConf.detectLanguage();
-        }
-        return $scope.countryFlagCode = function(lang) {
-          if (lang === 'en') {
-            return 'gb';
-          }
-          return lang;
-        };
-      }],
-      template: ('/dist/langPicker.html', '<div uib-dropdown="uib-dropdown" class="btn-group"><button type="button" uib-dropdown-toggle="uib-dropdown-toggle" ng-disabled="ngDisabled" class="btn btn-default"><flag country="{{countryFlagCode($langPickerConf.currentLang)}}"></flag>{{$langPickerConf.getCurrentLanguageName() || \'Language\'}}<span style="margin-left:3px;" class="caret"></span></button><ul uib-dropdown-menu="" role="menu"><li role="menuitem" ng-repeat="(lang_code, lang_name) in $langPickerConf.languageList" ng-click="$langPickerConf.setCurrentLanguage(lang_code)" ng-class="{\'active\': lang_code==$langPickerConf.currentLang}"><a href="javascript: void 0">   <flag country="{{countryFlagCode(lang_code)}}"></flag>{{lang_name}}</a></li></ul></div>' + '')
-    };
-  }]).directive('langPickerForNavbar', ["$langPickerConf", function($langPickerConf) {
-    return {
-      restrict: 'A',
-      replace: true,
-      scope: {
-        "default": '=?',
-        ngDisabled: '=?'
-      },
-      controller: ["$scope", function($scope) {
-        $scope.$langPickerConf = $langPickerConf;
-        if ($scope["default"]) {
-          $langPickerConf.setCurrentLanguage($scope["default"]);
-        } else {
-          $langPickerConf.detectLanguage();
-        }
-        return $scope.countryFlagCode = function(lang) {
-          if (lang === 'en') {
-            return 'gb';
-          }
-          return lang;
-        };
-      }],
-      template: ('/dist/langPickerForNavbar.html', '<li uib-dropdown="" class="dropdown"><a uib-dropdown-toggle="" style="cursor:pointer;" class="dropdown-toggle"><flag country="{{countryFlagCode($langPickerConf.currentLang)}}"></flag>{{$langPickerConf.getCurrentLanguageName() || \'Language\'}}<span style="margin-left:3px;" class="caret"></span></a><ul uib-dropdown-menu="" role="menu" class="dropdown-menu"><li role="menuitem" ng-repeat="(lang_code, lang_name) in $langPickerConf.languageList" ng-click="$langPickerConf.setCurrentLanguage(lang_code)" ng-class="{\'active\': lang_code==$langPickerConf.currentLang}"><a href="javascript: void 0">   <flag country="{{countryFlagCode(lang_code)}}"></flag>{{lang_name}}</a></li></ul></li>' + '')
-    };
   }]);
 
 }).call(this);
