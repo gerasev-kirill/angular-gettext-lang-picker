@@ -1,6 +1,7 @@
 {
   "name": "ui.gettext.langPicker",
-  "version": "1.0.1",
+  "description": "Angular1 language picker directive for gettext",
+  "version": "1.0.2",
   "authors": [
     "Gerasev Kirill <gerasev.kirill@gmail.com>"
   ],
@@ -30,5 +31,10 @@
             "stylesheets/flags16.css"
         ]
     }
+  },
+  "keywords": ["gettext", "angular", "language", "change", "button"],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/gerasev-kirill/angular-gettext-lang-picker.git"
   }
 }
