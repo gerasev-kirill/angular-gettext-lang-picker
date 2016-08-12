@@ -1,6 +1,6 @@
 {
-  "name": "ui.gettext.langPicker",
-  "version": "1.0.2",
+  "name": "ui.gettext.langpicker",
+  "version": "1.0.3",
   "main": "",
   "scripts": {
     "grunt": "grunt"
