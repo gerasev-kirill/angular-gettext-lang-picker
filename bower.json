@@ -1,5 +1,5 @@
 {
-  "name": "ui.gettext.lang.picker",
+  "name": "ui.gettext.langPicker",
   "version": "1.0.0",
   "authors": [
     "Gerasev Kirill <gerasev.kirill@gmail.com>"
@@ -11,7 +11,9 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
+    "tests",
+    "doc",
+    "Grunt*"
   ],
   "dependencies": {
     "angular-bootstrap": "~1.x",

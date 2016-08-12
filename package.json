@@ -1,21 +1,21 @@
 {
-  "name": "uiGettextLangPicker",
+  "name": "ui.gettext.langPicker",
   "version": "1.0.0",
   "main": "",
   "scripts": {
     "grunt": "grunt"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
-    "grunt": "^1.0.1",
     "angular-template-inline-js": "^0.1.6",
+    "grunt": "^1.0.1",
     "grunt-angular-template-inline-js": "^0.1.1",
     "grunt-contrib-coffee": "^0.13.0",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-jade": "^0.15.0",
     "grunt-contrib-uglify": "^0.11.0",
     "grunt-ng-annotate": "^1.0.1",
+    "grunt-ngdocs": "^0.2.10",
     "grunt-replace": "^0.11.0",
     "grunt-simple-watch": "^0.1.3"
   },

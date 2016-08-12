@@ -83,7 +83,19 @@ module.exports = (grunt)->
 				src: ['**/*.js'],
 				dest: 'src'
 			}
-		}
+		},
+		ngdocs:
+			options: {
+				dest: 'doc',
+				html5Mode: false,
+				inlinePartials: true,
+				title: 'LangPicker for gettext',
+				startPage: '/api/ui.gettext.langPicker'
+			},
+			api: {
+				src: ['src/**/*.js'],
+				title: 'Angular API Reference'
+			}
 	}
 	grunt.loadNpmTasks 'grunt-replace'
 	grunt.loadNpmTasks 'grunt-contrib-uglify'
@@ -93,6 +105,7 @@ module.exports = (grunt)->
 	grunt.loadNpmTasks 'grunt-angular-template-inline-js'
 	grunt.loadNpmTasks 'grunt-ng-annotate'
 	grunt.loadNpmTasks 'grunt-contrib-concat'
+	grunt.loadNpmTasks 'grunt-ngdocs'
 
 
 	grunt.registerTask 'default', 'simple-watch'

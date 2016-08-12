@@ -1,16 +1,62 @@
+###*
+*   @ngdoc service
+*   @name ui.gettext.langPicker.$langPicker
+*   @description configuration service
+###
 angular.module('ui.gettext.langPicker')
 
 
 
 
 .service '$langPicker', ($injector, gettextCatalog)->
-    # при инжекте $state прямо в сервис возникает циклическая зависимость
     @_lang_loaded = []
-    @languageList = []
+    ###*
+    *   @ngdoc property
+    *   @name ui.gettext.langPicker.$langPicker#languageList
+    *   @propertyOf ui.gettext.langPicker.$langPicker
+    *   @description
+    *       <label class="label type-hint type-hint-object">object</label>
+    *       object with lang-codes and lang-names.
+    *   @example
+    *       <pre>
+    *           $langPicker.languageList = {
+    *               en: 'English'
+    *           };
+    *       </pre>
+    ###
+    @languageList = {}
+    ###*
+    *   @ngdoc property
+    *   @name ui.gettext.langPicker.$langPicker#languageList
+    *   @propertyOf ui.gettext.langPicker.$langPicker
+    *   @description
+    *       <label class="label type-hint type-hint-string">string</label>
+    *       url to JSON catalogue with lazy-loading languages. More {@link https://angular-gettext.rocketeer.be/dev-guide/lazy-loading/ here}
+    *   @example
+    *       <pre>
+    *           $langPicker.remoteCatalogUrl = "/my/path";
+    *       </pre>
+    ###
     @remoteCatalogUrl = ''
+    ###*
+    *   @ngdoc property
+    *   @name ui.gettext.langPicker.$langPicker#currentLang
+    *   @propertyOf ui.gettext.langPicker.$langPicker
+    *   @description
+    *       <label class="label type-hint type-hint-string">string</label>
+    *       user language code in ["en", "ru", "ua", ...]
+    ###
     @currentLang = ''
 
     @setCurrentLanguage = (lang)=>
+        ###*
+        *   @ngdoc property
+        *   @name ui.gettext.langPicker.$langPicker#setCurrentLanguage
+        *   @methodOf ui.gettext.langPicker.$langPicker
+        *   @description
+        *        language setter for gettext(also reload state with lang code)
+        *   @param {string} lang lang code from $langPicker.languageList
+        ###
         if lang not in Object.keys(@languageList)
             langs = Object.keys(@languageList)
             throw {
@@ -24,6 +70,7 @@ angular.module('ui.gettext.langPicker')
         gettextCatalog.setCurrentLanguage(lang)
 
         # перегружаем состояние приложения
+        # при инжекте $state прямо в сервис возникает циклическая зависимость
         $state = $injector.get('$state')
         if !$state.current.name
             return
@@ -34,22 +81,65 @@ angular.module('ui.gettext.langPicker')
             params,
             {notify:false, reload:false}
         )
+        return
 
     @setLanguageList = (list)=>
+        ###*
+        *   @ngdoc property
+        *   @name ui.gettext.langPicker.$langPicker#setLanguageList
+        *   @methodOf ui.gettext.langPicker.$langPicker
+        *   @description
+        *        language list setter.
+        *        Please, use language codes from {@link https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes}
+        *           (two-letter codes, one per language)
+        *   @param {object} list language list
+        *   @example
+        *   <pre>
+        *       $langPicker.setLanguageList({
+        *            en: "English",
+        *            ru: "Русский",
+        *            ua: "Українська",
+        *            cz: "Čeština",
+        *            de: "Deutsch"
+        *       });
+        *   </pre>
+        ###
         @languageList = angular.copy(list)
 
 
     @setLanguageRemoteUrl = (url)=>
+        ###*
+        *   @ngdoc property
+        *   @name ui.gettext.langPicker.$langPicker#setLanguageRemoteUrl
+        *   @methodOf ui.gettext.langPicker.$langPicker
+        *   @description
+        *        setter for remoteCatalogUrl
+        *   @param {string} url url to JSON catalogue with lazy-loading languages. More {@link https://angular-gettext.rocketeer.be/dev-guide/lazy-loading/ here}
+        ###
         @remoteCatalogUrl = angular.copy(url)
 
 
     @getCurrentLanguageName = ()=>
+        ###*
+        *   @ngdoc property
+        *   @name ui.gettext.langPicker.$langPicker#getCurrentLanguageName
+        *   @methodOf ui.gettext.langPicker.$langPicker
+        *   @description
+        *        getter for language name(not code!).
+        ###
         if @currentLang not in Object.keys(@languageList)
             return ''
         @languageList[@currentLang]
 
 
     @detectLanguage = ()=>
+        ###*
+        *   @ngdoc property
+        *   @name ui.gettext.langPicker.$langPicker#detectLanguage
+        *   @methodOf ui.gettext.langPicker.$langPicker
+        *   @description
+        *        language detector(ui.router or window.navigator object)
+        ###
         $state = $injector.get('$state')
         params = $state.params or {}
         if params.lang
