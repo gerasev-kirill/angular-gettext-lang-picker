@@ -3,7 +3,7 @@ angular.module('ui.gettext.langPicker')
 
 
 
-.config ($provide) ->
+.config ($provide, $stateProvider) ->
     # http://stackoverflow.com/questions/24972750/angular-ui-router-default-parameter
     $provide.decorator '$state', ($delegate, $langPicker) ->
         state = $delegate
@@ -31,3 +31,8 @@ angular.module('ui.gettext.langPicker')
         state.href = href
 
         $delegate
+
+    # http://stackoverflow.com/questions/29892353/angular-ui-router-resolve-state-from-url/30926025#30926025
+    $stateProvider.decorator 'parent', (internalStateObj, parentFn)->
+        internalStateObj.self.$$state = ()-> internalStateObj
+        parentFn(internalStateObj)

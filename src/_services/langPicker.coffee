@@ -141,9 +141,15 @@ angular.module('ui.gettext.langPicker')
         *        language detector(ui.router or window.navigator object)
         ###
         $state = $injector.get('$state')
-        params = $state.params or {}
-        if params.lang
-            return @setCurrentLanguage(params.lang)
+        $location = $injector.get('$location')
+        url = $location.url()
+
+        for state in $state.get() when state.$$state
+            s = state.$$state()
+            params = s.url.exec(url) or {}
+            if params.lang
+                return @setCurrentLanguage(params.lang)
+
 
         languages = window.navigator.languages || [window.navigator.language || window.navigator.userLanguage]
         for l in languages

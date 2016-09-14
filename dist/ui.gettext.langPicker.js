@@ -1,7 +1,72 @@
+
+/**
+*   @ngdoc overview
+*   @name ui.gettext.langPicker
+*   @description
+*       Language picker for {@link https://angular-gettext.rocketeer.be }
+*   @example
+*   <pre>
+*       angular.module('MyApp', ['gettext', 'ui.bootstrap', 'ui.router', 'ui.gettext.langPicker'])
+*
+*       .run(funtion($langPicker){
+*            $langPicker.setLanguageList({
+*                en: "English",
+*                ru: "Русский",
+*                ua: "Українська",
+*                cz: "Čeština",
+*                de: "Deutsch"
+*            });
+*            $langPicker.detectLanguage();
+*       })
+*
+*       .config(function($stateProvider){
+*           $stateProvider.state('app', {
+*                abstract: true,
+*                url: '/{lang:(?:ru|ua|en|fr|de|cz)}', // or any other lang code
+*                template: '<ui-view/>'
+*            });
+*       })
+*
+*       // now you can define other states as usual(with prefix 'app' in name). ex.:
+*       .config(function($stateProvider){
+*           $stateProvider.state('app.hello', {
+*                url: '/hello',
+*                template: '<hello></hello>'
+*            });
+*       })
+*   </pre>
+*   Add directive ui-lang-picker to html:
+*   <pre>
+*       <ui-lang-picker></ui-lang-picker>
+*   </pre>
+*   That's it:
+*   <div style="margin-bottom:2em;">
+*       <img src="img/app.png"/>
+*   </div>
+ */
+
 (function() {
   angular.module('ui.gettext.langPicker', ['uiFlag', 'ui.bootstrap', 'ui.router']);
 
 }).call(this);
+
+
+/**
+*   @ngdoc directive
+*   @name ui.gettext.langPicker.directive:uiLangPicker
+*   @description language picker directive for bootstrap framework(as button)
+*   @restrict E
+*   @param {expression=} ngDisabled If the expression is truthy, then the disabled attribute will be set on the element
+*   @example
+*       <pre>
+*           //html
+*           <ui-lang-picker></ui-lang-picker>
+*       </pre>
+*       Output:
+*       <div style="margin-bottom: 2em;">
+*           <img src="img/uiLangPicker.jpg"/>
+*       </div>
+ */
 
 (function() {
   angular.module('ui.gettext.langPicker').directive('uiLangPicker', ["$langPicker", function($langPicker) {
@@ -29,6 +94,27 @@
 
 }).call(this);
 
+
+/**
+*   @ngdoc directive
+*   @name ui.gettext.langPicker.directive:uiLangPickerForNavbar
+*   @description language picker directive for navbar from bootstrap framework
+*   @restrict A
+*   @param {expression=} ngDisabled If the expression is truthy, then the disabled attribute will be set on the element
+*   @example
+*       <pre>
+*           //html
+*           <ul class="nav navbar-nav">
+*              <li ui-lang-picker-for-navbar>
+*              ...
+*           </ul>
+*       </pre>
+*       Output:
+*       <div style="margin-bottom: 2em;">
+*           <img src="img/uiLangPickerForNavbar.jpg"/>
+*       </div>
+ */
+
 (function() {
   angular.module('ui.gettext.langPicker').directive('uiLangPickerForNavbar', ["$langPicker", function($langPicker) {
     return {
@@ -53,16 +139,69 @@
 
 }).call(this);
 
+
+/**
+*   @ngdoc service
+*   @name ui.gettext.langPicker.$langPicker
+*   @description configuration service
+ */
+
 (function() {
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   angular.module('ui.gettext.langPicker').service('$langPicker', ["$injector", "gettextCatalog", function($injector, gettextCatalog) {
     this._lang_loaded = [];
-    this.languageList = [];
+
+    /**
+    *   @ngdoc property
+    *   @name ui.gettext.langPicker.$langPicker#languageList
+    *   @propertyOf ui.gettext.langPicker.$langPicker
+    *   @description
+    *       <label class="label type-hint type-hint-object">object</label>
+    *       object with lang-codes and lang-names.
+    *   @example
+    *       <pre>
+    *           $langPicker.languageList = {
+    *               en: 'English'
+    *           };
+    *       </pre>
+     */
+    this.languageList = {};
+
+    /**
+    *   @ngdoc property
+    *   @name ui.gettext.langPicker.$langPicker#languageList
+    *   @propertyOf ui.gettext.langPicker.$langPicker
+    *   @description
+    *       <label class="label type-hint type-hint-string">string</label>
+    *       url to JSON catalogue with lazy-loading languages. More {@link https://angular-gettext.rocketeer.be/dev-guide/lazy-loading/ here}
+    *   @example
+    *       <pre>
+    *           $langPicker.remoteCatalogUrl = "/my/path";
+    *       </pre>
+     */
     this.remoteCatalogUrl = '';
+
+    /**
+    *   @ngdoc property
+    *   @name ui.gettext.langPicker.$langPicker#currentLang
+    *   @propertyOf ui.gettext.langPicker.$langPicker
+    *   @description
+    *       <label class="label type-hint type-hint-string">string</label>
+    *       user language code in ["en", "ru", "ua", ...]
+     */
     this.currentLang = '';
     this.setCurrentLanguage = (function(_this) {
       return function(lang) {
+
+        /**
+        *   @ngdoc property
+        *   @name ui.gettext.langPicker.$langPicker#setCurrentLanguage
+        *   @methodOf ui.gettext.langPicker.$langPicker
+        *   @description
+        *        language setter for gettext(also reload state with lang code)
+        *   @param {string} lang lang code from $langPicker.languageList
+         */
         var $state, langs, params;
         if (__indexOf.call(Object.keys(_this.languageList), lang) < 0) {
           langs = Object.keys(_this.languageList);
@@ -82,7 +221,7 @@
         }
         params = $state.params || {};
         params.lang = lang;
-        return $state.go($state.current.name, params, {
+        $state.go($state.current.name, params, {
           notify: false,
           reload: false
         });
@@ -90,16 +229,54 @@
     })(this);
     this.setLanguageList = (function(_this) {
       return function(list) {
+
+        /**
+        *   @ngdoc property
+        *   @name ui.gettext.langPicker.$langPicker#setLanguageList
+        *   @methodOf ui.gettext.langPicker.$langPicker
+        *   @description
+        *        language list setter.
+        *        Please, use language codes from {@link https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes}
+        *           (two-letter codes, one per language)
+        *   @param {object} list language list
+        *   @example
+        *   <pre>
+        *       $langPicker.setLanguageList({
+        *            en: "English",
+        *            ru: "Русский",
+        *            ua: "Українська",
+        *            cz: "Čeština",
+        *            de: "Deutsch"
+        *       });
+        *   </pre>
+         */
         return _this.languageList = angular.copy(list);
       };
     })(this);
     this.setLanguageRemoteUrl = (function(_this) {
       return function(url) {
+
+        /**
+        *   @ngdoc property
+        *   @name ui.gettext.langPicker.$langPicker#setLanguageRemoteUrl
+        *   @methodOf ui.gettext.langPicker.$langPicker
+        *   @description
+        *        setter for remoteCatalogUrl
+        *   @param {string} url url to JSON catalogue with lazy-loading languages. More {@link https://angular-gettext.rocketeer.be/dev-guide/lazy-loading/ here}
+         */
         return _this.remoteCatalogUrl = angular.copy(url);
       };
     })(this);
     this.getCurrentLanguageName = (function(_this) {
       return function() {
+
+        /**
+        *   @ngdoc property
+        *   @name ui.gettext.langPicker.$langPicker#getCurrentLanguageName
+        *   @methodOf ui.gettext.langPicker.$langPicker
+        *   @description
+        *        getter for language name(not code!).
+         */
         var _ref;
         if (_ref = _this.currentLang, __indexOf.call(Object.keys(_this.languageList), _ref) < 0) {
           return '';
@@ -109,15 +286,33 @@
     })(this);
     this.detectLanguage = (function(_this) {
       return function() {
-        var $state, l, languages, params, _i, _len;
+
+        /**
+        *   @ngdoc property
+        *   @name ui.gettext.langPicker.$langPicker#detectLanguage
+        *   @methodOf ui.gettext.langPicker.$langPicker
+        *   @description
+        *        language detector(ui.router or window.navigator object)
+         */
+        var $location, $state, l, languages, params, s, state, url, _i, _j, _len, _len1, _ref;
         $state = $injector.get('$state');
-        params = $state.params || {};
-        if (params.lang) {
-          return _this.setCurrentLanguage(params.lang);
+        $location = $injector.get('$location');
+        url = $location.url();
+        _ref = $state.get();
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          state = _ref[_i];
+          if (!state.$$state) {
+            continue;
+          }
+          s = state.$$state();
+          params = s.url.exec(url) || {};
+          if (params.lang) {
+            return _this.setCurrentLanguage(params.lang);
+          }
         }
         languages = window.navigator.languages || [window.navigator.language || window.navigator.userLanguage];
-        for (_i = 0, _len = languages.length; _i < _len; _i++) {
-          l = languages[_i];
+        for (_j = 0, _len1 = languages.length; _j < _len1; _j++) {
+          l = languages[_j];
           l = l.split('-')[0];
           if (__indexOf.call(Object.keys(_this.languageList), l) >= 0) {
             _this.setCurrentLanguage(l);
@@ -132,8 +327,8 @@
 }).call(this);
 
 (function() {
-  angular.module('ui.gettext.langPicker').config(["$provide", function($provide) {
-    return $provide.decorator('$state', ["$delegate", "$langPicker", function($delegate, $langPicker) {
+  angular.module('ui.gettext.langPicker').config(["$provide", "$stateProvider", function($provide, $stateProvider) {
+    $provide.decorator('$state', ["$delegate", "$langPicker", function($delegate, $langPicker) {
       var go, href, state;
       state = $delegate;
       state.baseGo = state.go;
@@ -156,6 +351,12 @@
       state.href = href;
       return $delegate;
     }]);
+    return $stateProvider.decorator('parent', function(internalStateObj, parentFn) {
+      internalStateObj.self.$$state = function() {
+        return internalStateObj;
+      };
+      return parentFn(internalStateObj);
+    });
   }]);
 
 }).call(this);
