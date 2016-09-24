@@ -147,7 +147,7 @@
  */
 
 (function() {
-  var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   angular.module('ui.gettext.langPicker').service('$langPicker', ["$injector", "gettextCatalog", function($injector, gettextCatalog) {
     this._lang_loaded = [];
@@ -203,14 +203,14 @@
         *   @param {string} lang lang code from $langPicker.languageList
          */
         var $state, langs, params;
-        if (__indexOf.call(Object.keys(_this.languageList), lang) < 0) {
+        if (indexOf.call(Object.keys(_this.languageList), lang) < 0) {
           langs = Object.keys(_this.languageList);
           throw {
             message: "Unknown lang '" + lang + "'. Allowed are:  '" + (langs.join(', ')) + "'."
           };
         }
         _this.currentLang = lang;
-        if (__indexOf.call(_this._lang_loaded, lang) < 0) {
+        if (indexOf.call(_this._lang_loaded, lang) < 0) {
           gettextCatalog.loadRemote(_this.remoteCatalogUrl + lang + ".json");
           _this._lang_loaded.push(lang);
         }
@@ -277,8 +277,8 @@
         *   @description
         *        getter for language name(not code!).
          */
-        var _ref;
-        if (_ref = _this.currentLang, __indexOf.call(Object.keys(_this.languageList), _ref) < 0) {
+        var ref;
+        if (ref = _this.currentLang, indexOf.call(Object.keys(_this.languageList), ref) < 0) {
           return '';
         }
         return _this.languageList[_this.currentLang];
@@ -294,13 +294,13 @@
         *   @description
         *        language detector(ui.router or window.navigator object)
          */
-        var $location, $state, l, languages, params, s, state, url, _i, _j, _len, _len1, _ref;
+        var $location, $state, i, j, keys, l, languages, len, len1, params, ref, s, state, url;
         $state = $injector.get('$state');
         $location = $injector.get('$location');
         url = $location.url();
-        _ref = $state.get();
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          state = _ref[_i];
+        ref = $state.get();
+        for (i = 0, len = ref.length; i < len; i++) {
+          state = ref[i];
           if (!state.$$state) {
             continue;
           }
@@ -311,14 +311,15 @@
           }
         }
         languages = window.navigator.languages || [window.navigator.language || window.navigator.userLanguage];
-        for (_j = 0, _len1 = languages.length; _j < _len1; _j++) {
-          l = languages[_j];
+        for (j = 0, len1 = languages.length; j < len1; j++) {
+          l = languages[j];
           l = l.split('-')[0];
-          if (__indexOf.call(Object.keys(_this.languageList), l) >= 0) {
-            _this.setCurrentLanguage(l);
-            break;
+          if (indexOf.call(Object.keys(_this.languageList), l) >= 0) {
+            return _this.setCurrentLanguage(l);
           }
         }
+        keys = Object.keys(_this.languageList);
+        _this.setCurrentLanguage(keys[0]);
       };
     })(this);
     return this;

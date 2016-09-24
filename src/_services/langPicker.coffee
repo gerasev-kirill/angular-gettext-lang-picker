@@ -155,8 +155,9 @@ angular.module('ui.gettext.langPicker')
         for l in languages
             l = l.split('-')[0]
             if l in Object.keys(@languageList)
-                @setCurrentLanguage(l)
-                break
+                return @setCurrentLanguage(l)
+        keys = Object.keys(@languageList)
+        @setCurrentLanguage(keys[0])
         return
 
 
