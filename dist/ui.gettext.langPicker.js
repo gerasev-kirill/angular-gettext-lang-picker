@@ -305,7 +305,7 @@
             continue;
           }
           s = state.$$state();
-          params = s.url.exec(url) || {};
+          params = s.url.exec(url) || s.url.exec(url.split('?')[0]) || {};
           if (params.lang) {
             return _this.setCurrentLanguage(params.lang);
           }

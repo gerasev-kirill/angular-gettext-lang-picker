@@ -146,7 +146,7 @@ angular.module('ui.gettext.langPicker')
 
         for state in $state.get() when state.$$state
             s = state.$$state()
-            params = s.url.exec(url) or {}
+            params = s.url.exec(url) or s.url.exec(url.split('?')[0]) or {}
             if params.lang
                 return @setCurrentLanguage(params.lang)
 
