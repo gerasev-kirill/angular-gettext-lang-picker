@@ -62,6 +62,9 @@ angular.module('ui.gettext.langPicker')
             throw {
                 message: "Unknown lang '#{lang}'. Allowed are:  '#{langs.join(', ')}'."
             }
+        
+        oldValue = angular.copy(@currentLang)
+        newValue = angular.copy(lang)
         @currentLang = lang
 
         if lang not in @_lang_loaded
@@ -81,6 +84,7 @@ angular.module('ui.gettext.langPicker')
             params,
             {notify:false, reload:false}
         )
+        $rootScope.$emit('$langPickerLangChanged', newValue, oldValue)
         return
 
     @setLanguageList = (list)=>

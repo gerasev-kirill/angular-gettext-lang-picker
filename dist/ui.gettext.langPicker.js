@@ -202,13 +202,15 @@
         *        language setter for gettext(also reload state with lang code)
         *   @param {string} lang lang code from $langPicker.languageList
          */
-        var $state, langs, params;
+        var $state, langs, newValue, oldValue, params;
         if (indexOf.call(Object.keys(_this.languageList), lang) < 0) {
           langs = Object.keys(_this.languageList);
           throw {
             message: "Unknown lang '" + lang + "'. Allowed are:  '" + (langs.join(', ')) + "'."
           };
         }
+        oldValue = angular.copy(_this.currentLang);
+        newValue = angular.copy(lang);
         _this.currentLang = lang;
         if (indexOf.call(_this._lang_loaded, lang) < 0) {
           gettextCatalog.loadRemote(_this.remoteCatalogUrl + lang + ".json");
@@ -225,6 +227,7 @@
           notify: false,
           reload: false
         });
+        $rootScope.$emit('$langPickerLangChanged', newValue, oldValue);
       };
     })(this);
     this.setLanguageList = (function(_this) {
