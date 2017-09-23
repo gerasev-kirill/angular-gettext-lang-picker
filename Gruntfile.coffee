@@ -8,7 +8,6 @@ module.exports = (grunt)->
 				continue
 			list.push("#{d}/**/module*.js")
 			list.push("#{d}/**/!(module*)*.js")
-		console.log list
 		list
 
 	grunt.initConfig {

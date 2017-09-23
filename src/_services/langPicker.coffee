@@ -8,7 +8,7 @@ angular.module('ui.gettext.langPicker')
 
 
 
-.service '$langPicker', ($injector, gettextCatalog)->
+.service '$langPicker', ($injector, $rootScope, gettextCatalog)->
     @_lang_loaded = []
     ###*
     *   @ngdoc property
@@ -62,7 +62,7 @@ angular.module('ui.gettext.langPicker')
             throw {
                 message: "Unknown lang '#{lang}'. Allowed are:  '#{langs.join(', ')}'."
             }
-        
+
         oldValue = angular.copy(@currentLang)
         newValue = angular.copy(lang)
         @currentLang = lang
