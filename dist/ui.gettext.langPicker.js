@@ -333,27 +333,25 @@
 (function() {
   angular.module('ui.gettext.langPicker').config(["$provide", "$stateProvider", function($provide, $stateProvider) {
     $provide.decorator('$state', ["$delegate", "$langPicker", function($delegate, $langPicker) {
-      var go, href, state;
+      var baseGo, baseHref, state;
       state = $delegate;
-      state.baseGo = state.go;
-      go = function(to, params, options) {
+      baseGo = state.go;
+      state.go = function(to, params, options) {
         params = params || {};
         params.lang = $langPicker.currentLang;
-        return this.baseGo(to, params, options);
+        return baseGo(to, params, options);
       };
-      state.go = go;
-      state.baseHref = state.href;
-      href = function(stateOrName, params, options) {
+      baseHref = state.href;
+      state.href = function(stateOrName, params, options) {
         var url;
         params = params || {};
-        url = this.baseHref(stateOrName, params, options);
+        url = baseHref(stateOrName, params, options);
         if (!params.lang && url) {
           url = url.replace('//', '/');
         }
         return url;
       };
-      state.href = href;
-      return $delegate;
+      return state;
     }]);
     return $stateProvider.decorator('parent', function(internalStateObj, parentFn) {
       internalStateObj.self.$$state = function() {
