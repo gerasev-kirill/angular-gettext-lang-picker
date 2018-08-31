@@ -1,11 +1,11 @@
 {
   "name": "ui.gettext.langpicker",
   "description": "Angular1 language picker directive for gettext",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "authors": [
     "Gerasev Kirill <gerasev.kirill@gmail.com>"
   ],
-  "main": "dist/ui.gettext.langPicker.min.js",
+  "main": "dist/ui.gettext.langPicker.js",
   "license": "MIT",
   "ignore": [
     "**/.*",
