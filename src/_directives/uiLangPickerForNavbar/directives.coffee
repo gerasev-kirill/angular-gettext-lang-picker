@@ -22,20 +22,21 @@ angular.module('ui.gettext.langPicker')
 
 
 
-.directive 'uiLangPickerForNavbar',
-    ($langPicker) ->
-        restrict: 'A'
-        replace: true
-        link: ($scope, $element, attrs) ->
-            $scope.$langPicker = $langPicker
-            $scope.attrs = attrs
+.directive 'uiLangPickerForNavbar', ($langPicker) ->
+    restrict: 'A'
+    replace: true
+    controller: ($scope, $attrs, $langPicker, $state) ->
+        $scope.$state = $state
+        $scope.$langPicker = $langPicker
+        $scope.attrs = $attrs
 
-            if not $langPicker.currentLang
-                $langPicker.detectLanguage()
+        if not $langPicker.currentLang
+            $langPicker.detectLanguage()
 
-            $scope.countryFlagCode = (lang) ->
-                if lang=='en' then return 'gb'
-                lang
+        $scope.countryFlagCode = (lang) ->
+            if $langPicker.languageCodeToCountryCodeMapping[lang]
+                return $langPicker.languageCodeToCountryCodeMapping[lang]
+            lang
 
 
-        templateUrl: '/@@__SOURCE_PATH__/uiLangPickerForNavbar.html'
+    templateUrl: '/@@__SOURCE_PATH__/uiLangPickerForNavbar.html'

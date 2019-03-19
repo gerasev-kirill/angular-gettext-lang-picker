@@ -25,6 +25,11 @@ angular.module('ui.gettext.langPicker')
     *       </pre>
     ###
     @languageList = {}
+    @languageCodeToCountryCodeMapping = {
+        en: 'gb'
+        cz: 'cs'
+        da: 'dk'
+    }
     ###*
     *   @ngdoc property
     *   @name ui.gettext.langPicker.$langPicker#languageList
@@ -136,7 +141,7 @@ angular.module('ui.gettext.langPicker')
         @languageList[@currentLang]
 
 
-    @detectLanguage = ()=>
+    @detectLanguage = (defaultLang)=>
         ###*
         *   @ngdoc property
         *   @name ui.gettext.langPicker.$langPicker#detectLanguage
@@ -146,22 +151,26 @@ angular.module('ui.gettext.langPicker')
         ###
         $state = $injector.get('$state')
         $location = $injector.get('$location')
+        allowedLangs = Object.keys(@languageList)
         url = $location.url()
 
         for state in $state.get() when state.$$state
             s = state.$$state()
             params = s.url.exec(url) or s.url.exec(url.split('?')[0]) or {}
-            if params.lang
+            if params.lang and params.lang in allowedLangs
                 return @setCurrentLanguage(params.lang)
 
 
         languages = window.navigator.languages || [window.navigator.language || window.navigator.userLanguage]
         for l in languages
             l = l.split('-')[0]
-            if l in Object.keys(@languageList)
+            if l in allowedLangs
                 return @setCurrentLanguage(l)
-        keys = Object.keys(@languageList)
-        @setCurrentLanguage(keys[0])
+        if defaultLang in allowedLangs
+            lang = defaultLang
+        else
+            lang = allowedLangs[0]
+        @setCurrentLanguage(lang)
         return
 
 

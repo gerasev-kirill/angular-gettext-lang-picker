@@ -19,21 +19,21 @@ angular.module('ui.gettext.langPicker')
 
 
 
-.directive 'uiLangPicker',
-    ($langPicker) ->
-        restrict: 'E'
-        scope:{
-            default: '=?',
-            ngDisabled: '=?'
-        }
-        controller: ($scope) ->
-            $scope.$langPicker = $langPicker
-            if not $langPicker.currentLang
-                $langPicker.detectLanguage()
+.directive 'uiLangPicker', () ->
+    restrict: 'E'
+    scope:{
+        default: '=?',
+        ngDisabled: '=?'
+    }
+    controller: ($scope, $langPicker) ->
+        $scope.$langPicker = $langPicker
+        if not $langPicker.currentLang
+            $langPicker.detectLanguage($scope.default)
 
-            $scope.countryFlagCode = (lang) ->
-                if lang=='en' then return 'gb'
-                lang
+        $scope.countryFlagCode = (lang) ->
+            if $langPicker.languageCodeToCountryCodeMapping[lang]
+                return $langPicker.languageCodeToCountryCodeMapping[lang]
+            lang
 
 
-        templateUrl: '/@@__SOURCE_PATH__/uiLangPicker.html'
+    templateUrl: '/@@__SOURCE_PATH__/uiLangPicker.html'
