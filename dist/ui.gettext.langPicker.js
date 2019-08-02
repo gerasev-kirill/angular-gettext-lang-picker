@@ -176,7 +176,7 @@
     this.languageList = {};
     this.languageCodeToCountryCodeMapping = {
       en: 'gb',
-      cz: 'cs',
+      cs: 'cz',
       da: 'dk'
     };
     /**
