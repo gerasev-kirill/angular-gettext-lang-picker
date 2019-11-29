@@ -118,31 +118,36 @@
 *           <img src="img/uiLangPickerForNavbar.jpg"/>
 *       </div>
  */
-
-(function() {
-  angular.module('ui.gettext.langPicker').directive('uiLangPickerForNavbar', ["$langPicker", function($langPicker) {
-    return {
-      restrict: 'A',
-      replace: true,
-      controller: ["$scope", "$attrs", "$langPicker", "$state", function($scope, $attrs, $langPicker, $state) {
-        $scope.$state = $state;
-        $scope.$langPicker = $langPicker;
-        $scope.attrs = $attrs;
-        if (!$langPicker.currentLang) {
-          $langPicker.detectLanguage();
+angular.module('ui.gettext.langPicker').directive('uiLangPickerForNavbar', ["$langPicker", function($langPicker) {
+  return {
+    restrict: 'A',
+    replace: true,
+    controller: ["$scope", "$attrs", "$element", "$langPicker", "$state", function($scope, $attrs, $element, $langPicker, $state) {
+      $scope.$state = $state;
+      $scope.$langPicker = $langPicker;
+      $scope.attrs = $attrs;
+      if (!$langPicker.currentLang) {
+        $langPicker.detectLanguage();
+      }
+      $scope.countryFlagCode = function(lang) {
+        if ($langPicker.languageCodeToCountryCodeMapping[lang]) {
+          return $langPicker.languageCodeToCountryCodeMapping[lang];
         }
-        return $scope.countryFlagCode = function(lang) {
-          if ($langPicker.languageCodeToCountryCodeMapping[lang]) {
-            return $langPicker.languageCodeToCountryCodeMapping[lang];
-          }
-          return lang;
-        };
-      }],
-      template: ('/src/_directives/uiLangPickerForNavbar/uiLangPickerForNavbar.html', '\n<li class="dropdown" uib-dropdown=""><a class="dropdown-toggle" uib-dropdown-toggle="" style="cursor:pointer;" ng-disabled="attrs.disabled">\n    <flag country="{{countryFlagCode($langPicker.currentLang)}}"></flag>{{$langPicker.getCurrentLanguageName() || \'Language\'}}<span class="caret" style="margin-left:3px;"></span></a>\n  <ul class="dropdown-menu" uib-dropdown-menu="" role="menu">\n    <li role="menuitem" ng-repeat="(lang_code, lang_name) in $langPicker.languageList" ng-click="$langPicker.setCurrentLanguage(lang_code)" ng-class="{\'active\': lang_code==$langPicker.currentLang}"><a href="javascript: void 0">   \n        <flag country="{{countryFlagCode(lang_code)}}"></flag>{{lang_name}}</a></li>\n  </ul>\n</li>' + '')
-    };
-  }]);
-
-}).call(this);
+        return lang;
+      };
+      return $scope.$watch('$langPicker.languageList', function(languageList, oldValue) {
+        var langs;
+        langs = Object.keys(languageList || {});
+        if (langs.length <= 1) {
+          $element.addClass('ng-hide');
+        } else {
+          $element.removeClass('ng-hide');
+        }
+      }, true);
+    }],
+    template: ('/src/_directives/uiLangPickerForNavbar/uiLangPickerForNavbar.html', '\n<li class="dropdown" uib-dropdown=""><a class="dropdown-toggle" uib-dropdown-toggle="" style="cursor:pointer;" ng-disabled="attrs.disabled">\n    <flag country="{{countryFlagCode($langPicker.currentLang)}}"></flag>{{$langPicker.getCurrentLanguageName() || \'Language\'}}<span class="caret" style="margin-left:3px;"></span></a>\n  <ul class="dropdown-menu" uib-dropdown-menu="" role="menu">\n    <li role="menuitem" ng-repeat="(lang_code, lang_name) in $langPicker.languageList" ng-click="$langPicker.setCurrentLanguage(lang_code)" ng-class="{\'active\': lang_code==$langPicker.currentLang}"><a href="javascript: void 0">   \n        <flag country="{{countryFlagCode(lang_code)}}"></flag>{{lang_name}}</a></li>\n  </ul>\n</li>' + '')
+  };
+}]);
 
 
 /**

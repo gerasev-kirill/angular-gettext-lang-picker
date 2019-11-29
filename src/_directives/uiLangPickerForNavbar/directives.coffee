@@ -25,7 +25,7 @@ angular.module('ui.gettext.langPicker')
 .directive 'uiLangPickerForNavbar', ($langPicker) ->
     restrict: 'A'
     replace: true
-    controller: ($scope, $attrs, $langPicker, $state) ->
+    controller: ($scope, $attrs, $element, $langPicker, $state) ->
         $scope.$state = $state
         $scope.$langPicker = $langPicker
         $scope.attrs = $attrs
@@ -38,5 +38,15 @@ angular.module('ui.gettext.langPicker')
                 return $langPicker.languageCodeToCountryCodeMapping[lang]
             lang
 
+        $scope.$watch '$langPicker.languageList',
+            (languageList, oldValue)->
+                langs = Object.keys(languageList or {})
+                if langs.length <= 1
+                    $element.addClass('ng-hide')
+                else
+                    $element.removeClass('ng-hide')
+                return
+            ,
+            true
 
     templateUrl: '/@@__SOURCE_PATH__/uiLangPickerForNavbar.html'
