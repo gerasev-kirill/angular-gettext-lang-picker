@@ -23,6 +23,13 @@ angular.module('ui.gettext.langPicker')
 
 
 .directive 'uiLangPickerForNavbar', ($langPicker) ->
+    angular.element(document).find('head').prepend("""
+    <style type="text/css">
+        li.force-ng-hide[ui-lang-picker-for-navbar]{
+            display: none;
+        }
+    </style>
+    """)
     restrict: 'A'
     replace: true
     controller: ($scope, $attrs, $element, $langPicker, $state) ->
@@ -42,9 +49,11 @@ angular.module('ui.gettext.langPicker')
             (languageList, oldValue)->
                 langs = Object.keys(languageList or {})
                 if langs.length <= 1
-                    $element.addClass('ng-hide')
+                    $element.addClass('force-ng-hide')
                 else
-                    $element.removeClass('ng-hide')
+                    $element.removeClass('force-ng-hide')
+                if $langPicker.currentLang and !langs.includes($langPicker.currentLang)
+                    $langPicker.detectLanguage()
                 return
             ,
             true

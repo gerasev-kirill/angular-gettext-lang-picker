@@ -119,6 +119,7 @@
 *       </div>
  */
 angular.module('ui.gettext.langPicker').directive('uiLangPickerForNavbar', ["$langPicker", function($langPicker) {
+  angular.element(document).find('head').prepend("<style type=\"text/css\">\n    li.force-ng-hide[ui-lang-picker-for-navbar]{\n        display: none;\n    }\n</style>");
   return {
     restrict: 'A',
     replace: true,
@@ -139,9 +140,12 @@ angular.module('ui.gettext.langPicker').directive('uiLangPickerForNavbar', ["$la
         var langs;
         langs = Object.keys(languageList || {});
         if (langs.length <= 1) {
-          $element.addClass('ng-hide');
+          $element.addClass('force-ng-hide');
         } else {
-          $element.removeClass('ng-hide');
+          $element.removeClass('force-ng-hide');
+        }
+        if ($langPicker.currentLang && !langs.includes($langPicker.currentLang)) {
+          $langPicker.detectLanguage();
         }
       }, true);
     }],
@@ -154,61 +158,73 @@ angular.module('ui.gettext.langPicker').directive('uiLangPickerForNavbar', ["$la
 *   @ngdoc service
 *   @name ui.gettext.langPicker.$langPicker
 *   @description configuration service
-*/
+ */
+var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
+angular.module('ui.gettext.langPicker').service('$langPicker', ["$injector", "$rootScope", "gettextCatalog", function($injector, $rootScope, gettextCatalog) {
+  var ignoreLoadRemoteLangs;
+  ignoreLoadRemoteLangs = [];
+  this._lang_loaded = [];
 
-(function() {
-  var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  /**
+  *   @ngdoc property
+  *   @name ui.gettext.langPicker.$langPicker#languageList
+  *   @propertyOf ui.gettext.langPicker.$langPicker
+  *   @description
+  *       <label class="label type-hint type-hint-object">object</label>
+  *       object with lang-codes and lang-names.
+  *   @example
+  *       <pre>
+  *           $langPicker.languageList = {
+  *               en: 'English'
+  *           };
+  *       </pre>
+   */
+  this.languageList = {};
+  this.languageCodeToCountryCodeMapping = {
+    en: 'gb',
+    cs: 'cz',
+    da: 'dk'
+  };
 
-  angular.module('ui.gettext.langPicker').service('$langPicker', ["$injector", "$rootScope", "gettextCatalog", function($injector, $rootScope, gettextCatalog) {
-    var _this = this;
-    this._lang_loaded = [];
+  /**
+  *   @ngdoc property
+  *   @name ui.gettext.langPicker.$langPicker#languageList
+  *   @propertyOf ui.gettext.langPicker.$langPicker
+  *   @description
+  *       <label class="label type-hint type-hint-string">string</label>
+  *       url to JSON catalogue with lazy-loading languages. More {@link https://angular-gettext.rocketeer.be/dev-guide/lazy-loading/ here}
+  *   @example
+  *       <pre>
+  *           $langPicker.remoteCatalogUrl = "/my/path";
+  *       </pre>
+   */
+  this.remoteCatalogUrl = '';
+  this.setIgnoreLoadRemoteLangs = function(langs) {
+
     /**
     *   @ngdoc property
-    *   @name ui.gettext.langPicker.$langPicker#languageList
-    *   @propertyOf ui.gettext.langPicker.$langPicker
+    *   @name ui.gettext.langPicker.$langPicker#setIgnoreLoadRemoteLangs
+    *   @methodOf ui.gettext.langPicker.$langPicker
     *   @description
-    *       <label class="label type-hint type-hint-object">object</label>
-    *       object with lang-codes and lang-names.
-    *   @example
-    *       <pre>
-    *           $langPicker.languageList = {
-    *               en: 'English'
-    *           };
-    *       </pre>
-    */
+    *        setter for ignoring languages in gettextCatalog.loadRemote
+    *   @param {Array<String>} langs array of lang codes
+     */
+    ignoreLoadRemoteLangs = angular.copy(langs);
+  };
 
-    this.languageList = {};
-    this.languageCodeToCountryCodeMapping = {
-      en: 'gb',
-      cs: 'cz',
-      da: 'dk'
-    };
-    /**
-    *   @ngdoc property
-    *   @name ui.gettext.langPicker.$langPicker#languageList
-    *   @propertyOf ui.gettext.langPicker.$langPicker
-    *   @description
-    *       <label class="label type-hint type-hint-string">string</label>
-    *       url to JSON catalogue with lazy-loading languages. More {@link https://angular-gettext.rocketeer.be/dev-guide/lazy-loading/ here}
-    *   @example
-    *       <pre>
-    *           $langPicker.remoteCatalogUrl = "/my/path";
-    *       </pre>
-    */
+  /**
+  *   @ngdoc property
+  *   @name ui.gettext.langPicker.$langPicker#currentLang
+  *   @propertyOf ui.gettext.langPicker.$langPicker
+  *   @description
+  *       <label class="label type-hint type-hint-string">string</label>
+  *       user language code in ["en", "ru", "ua", ...]
+   */
+  this.currentLang = '';
+  this.setCurrentLanguage = (function(_this) {
+    return function(lang) {
 
-    this.remoteCatalogUrl = '';
-    /**
-    *   @ngdoc property
-    *   @name ui.gettext.langPicker.$langPicker#currentLang
-    *   @propertyOf ui.gettext.langPicker.$langPicker
-    *   @description
-    *       <label class="label type-hint type-hint-string">string</label>
-    *       user language code in ["en", "ru", "ua", ...]
-    */
-
-    this.currentLang = '';
-    this.setCurrentLanguage = function(lang) {
       /**
       *   @ngdoc property
       *   @name ui.gettext.langPicker.$langPicker#setCurrentLanguage
@@ -216,10 +232,9 @@ angular.module('ui.gettext.langPicker').directive('uiLangPickerForNavbar', ["$la
       *   @description
       *        language setter for gettext(also reload state with lang code)
       *   @param {string} lang lang code from $langPicker.languageList
-      */
-
+       */
       var $state, langs, newValue, oldValue, params;
-      if (__indexOf.call(Object.keys(_this.languageList), lang) < 0) {
+      if (indexOf.call(Object.keys(_this.languageList), lang) < 0) {
         langs = Object.keys(_this.languageList);
         throw {
           message: "Unknown lang '" + lang + "'. Allowed are:  '" + (langs.join(', ')) + "'."
@@ -228,7 +243,7 @@ angular.module('ui.gettext.langPicker').directive('uiLangPickerForNavbar', ["$la
       oldValue = angular.copy(_this.currentLang);
       newValue = angular.copy(lang);
       _this.currentLang = lang;
-      if (__indexOf.call(_this._lang_loaded, lang) < 0) {
+      if (indexOf.call(_this._lang_loaded, lang) < 0 && indexOf.call(ignoreLoadRemoteLangs, lang) < 0) {
         gettextCatalog.loadRemote(_this.remoteCatalogUrl + lang + ".json");
         _this._lang_loaded.push(lang);
       }
@@ -245,7 +260,10 @@ angular.module('ui.gettext.langPicker').directive('uiLangPickerForNavbar', ["$la
       });
       $rootScope.$emit('$langPickerLangChanged', newValue, oldValue);
     };
-    this.setLanguageList = function(list) {
+  })(this);
+  this.setLanguageList = (function(_this) {
+    return function(list) {
+
       /**
       *   @ngdoc property
       *   @name ui.gettext.langPicker.$langPicker#setLanguageList
@@ -265,10 +283,13 @@ angular.module('ui.gettext.langPicker').directive('uiLangPickerForNavbar', ["$la
       *            de: "Deutsch"
       *       });
       *   </pre>
-      */
+       */
       return _this.languageList = angular.copy(list);
     };
-    this.setLanguageRemoteUrl = function(url) {
+  })(this);
+  this.setLanguageRemoteUrl = (function(_this) {
+    return function(url) {
+
       /**
       *   @ngdoc property
       *   @name ui.gettext.langPicker.$langPicker#setLanguageRemoteUrl
@@ -276,100 +297,101 @@ angular.module('ui.gettext.langPicker').directive('uiLangPickerForNavbar', ["$la
       *   @description
       *        setter for remoteCatalogUrl
       *   @param {string} url url to JSON catalogue with lazy-loading languages. More {@link https://angular-gettext.rocketeer.be/dev-guide/lazy-loading/ here}
-      */
+       */
       return _this.remoteCatalogUrl = angular.copy(url);
     };
-    this.getCurrentLanguageName = function() {
+  })(this);
+  this.getCurrentLanguageName = (function(_this) {
+    return function() {
+
       /**
       *   @ngdoc property
       *   @name ui.gettext.langPicker.$langPicker#getCurrentLanguageName
       *   @methodOf ui.gettext.langPicker.$langPicker
       *   @description
       *        getter for language name(not code!).
-      */
-
-      var _ref;
-      if (_ref = _this.currentLang, __indexOf.call(Object.keys(_this.languageList), _ref) < 0) {
+       */
+      var ref;
+      if (ref = _this.currentLang, indexOf.call(Object.keys(_this.languageList), ref) < 0) {
         return '';
       }
       return _this.languageList[_this.currentLang];
     };
-    this.detectLanguage = function(defaultLang) {
+  })(this);
+  this.detectLanguage = (function(_this) {
+    return function(defaultLang) {
+
       /**
       *   @ngdoc property
       *   @name ui.gettext.langPicker.$langPicker#detectLanguage
       *   @methodOf ui.gettext.langPicker.$langPicker
       *   @description
       *        language detector(ui.router or window.navigator object)
-      */
-
-      var $location, $state, allowedLangs, l, lang, languages, params, s, state, url, _i, _j, _len, _len1, _ref, _ref1;
+       */
+      var $location, $state, allowedLangs, i, j, l, lang, languages, len, len1, params, ref, ref1, s, state, url;
       $state = $injector.get('$state');
       $location = $injector.get('$location');
       allowedLangs = Object.keys(_this.languageList);
       url = $location.url();
-      _ref = $state.get();
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        state = _ref[_i];
+      ref = $state.get();
+      for (i = 0, len = ref.length; i < len; i++) {
+        state = ref[i];
         if (!state.$$state) {
           continue;
         }
         s = state.$$state();
         params = s.url.exec(url) || s.url.exec(url.split('?')[0]) || {};
-        if (params.lang && (_ref1 = params.lang, __indexOf.call(allowedLangs, _ref1) >= 0)) {
+        if (params.lang && (ref1 = params.lang, indexOf.call(allowedLangs, ref1) >= 0)) {
           return _this.setCurrentLanguage(params.lang);
         }
       }
       languages = window.navigator.languages || [window.navigator.language || window.navigator.userLanguage];
-      for (_j = 0, _len1 = languages.length; _j < _len1; _j++) {
-        l = languages[_j];
+      for (j = 0, len1 = languages.length; j < len1; j++) {
+        l = languages[j];
         l = l.split('-')[0];
-        if (__indexOf.call(allowedLangs, l) >= 0) {
+        if (indexOf.call(allowedLangs, l) >= 0) {
           return _this.setCurrentLanguage(l);
         }
       }
-      if (__indexOf.call(allowedLangs, defaultLang) >= 0) {
+      if (indexOf.call(allowedLangs, defaultLang) >= 0) {
         lang = defaultLang;
       } else {
         lang = allowedLangs[0];
       }
       _this.setCurrentLanguage(lang);
     };
-    return this;
-  }]);
+  })(this);
+  return this;
+}]);
 
-}).call(this);
-
-(function() {
-
-  angular.module('ui.gettext.langPicker').config(["$provide", "$stateProvider", function($provide, $stateProvider) {
-    $provide.decorator('$state', ["$delegate", "$langPicker", function($delegate, $langPicker) {
-      var baseGo, baseHref, state;
-      state = $delegate;
-      baseGo = state.go;
-      state.go = function(to, params, options) {
-        params = params || {};
+angular.module('ui.gettext.langPicker').config(["$provide", "$stateProvider", function($provide, $stateProvider) {
+  $provide.decorator('$state', ["$delegate", "$langPicker", function($delegate, $langPicker) {
+    var baseGo, baseHref, state;
+    state = $delegate;
+    baseGo = state.go;
+    state.go = function(to, params, options) {
+      params = params || {};
+      if (!params.lang) {
         params.lang = $langPicker.currentLang;
-        return baseGo(to, params, options);
-      };
-      baseHref = state.href;
-      state.href = function(stateOrName, params, options) {
-        var url;
-        params = params || {};
-        url = baseHref(stateOrName, params, options);
-        if (!params.lang && url) {
-          url = url.replace('//', '/');
-        }
-        return url;
-      };
-      return state;
-    }]);
-    return $stateProvider.decorator('parent', function(internalStateObj, parentFn) {
-      internalStateObj.self.$$state = function() {
-        return internalStateObj;
-      };
-      return parentFn(internalStateObj);
-    });
+      }
+      return baseGo(to, params, options);
+    };
+    baseHref = state.href;
+    state.href = function(stateOrName, params, options) {
+      var url;
+      params = params || {};
+      url = baseHref(stateOrName, params, options);
+      if (!params.lang && url) {
+        url = url.replace('//', '/');
+      }
+      return url;
+    };
+    return state;
   }]);
-
-}).call(this);
+  return $stateProvider.decorator('parent', function(internalStateObj, parentFn) {
+    internalStateObj.self.$$state = function() {
+      return internalStateObj;
+    };
+    return parentFn(internalStateObj);
+  });
+}]);

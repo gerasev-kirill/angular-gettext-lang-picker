@@ -11,7 +11,8 @@ angular.module('ui.gettext.langPicker')
 
         state.go = (to, params, options) ->
             params = params  or  {}
-            params.lang = $langPicker.currentLang
+            if !params.lang
+                params.lang = $langPicker.currentLang
             baseGo(to, params, options)
 
         # оборачиваем также и вызов href.

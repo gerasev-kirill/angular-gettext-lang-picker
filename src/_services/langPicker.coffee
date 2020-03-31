@@ -9,6 +9,7 @@ angular.module('ui.gettext.langPicker')
 
 
 .service '$langPicker', ($injector, $rootScope, gettextCatalog)->
+    ignoreLoadRemoteLangs = []
     @_lang_loaded = []
     ###*
     *   @ngdoc property
@@ -43,6 +44,19 @@ angular.module('ui.gettext.langPicker')
     *       </pre>
     ###
     @remoteCatalogUrl = ''
+
+    @setIgnoreLoadRemoteLangs = (langs)->
+        ###*
+        *   @ngdoc property
+        *   @name ui.gettext.langPicker.$langPicker#setIgnoreLoadRemoteLangs
+        *   @methodOf ui.gettext.langPicker.$langPicker
+        *   @description
+        *        setter for ignoring languages in gettextCatalog.loadRemote
+        *   @param {Array<String>} langs array of lang codes
+        ###
+        ignoreLoadRemoteLangs = angular.copy(langs)
+        return
+
     ###*
     *   @ngdoc property
     *   @name ui.gettext.langPicker.$langPicker#currentLang
@@ -72,7 +86,7 @@ angular.module('ui.gettext.langPicker')
         newValue = angular.copy(lang)
         @currentLang = lang
 
-        if lang not in @_lang_loaded
+        if lang not in @_lang_loaded and lang not in ignoreLoadRemoteLangs
             gettextCatalog.loadRemote(@remoteCatalogUrl + lang + ".json")
             @_lang_loaded.push(lang)
         gettextCatalog.setCurrentLanguage(lang)
