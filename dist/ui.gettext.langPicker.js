@@ -200,11 +200,11 @@ angular.module('ui.gettext.langPicker').service('$langPicker', ["$injector", "$r
   *       </pre>
    */
   this.remoteCatalogUrl = '';
-  this.setIgnoreLoadRemoteLangs = function(langs) {
+  this.setIgnoreLoadRemoteLanguages = function(langs) {
 
     /**
     *   @ngdoc property
-    *   @name ui.gettext.langPicker.$langPicker#setIgnoreLoadRemoteLangs
+    *   @name ui.gettext.langPicker.$langPicker#setIgnoreLoadRemoteLanguages
     *   @methodOf ui.gettext.langPicker.$langPicker
     *   @description
     *        setter for ignoring languages in gettextCatalog.loadRemote

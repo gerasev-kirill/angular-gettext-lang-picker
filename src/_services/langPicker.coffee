@@ -45,10 +45,10 @@ angular.module('ui.gettext.langPicker')
     ###
     @remoteCatalogUrl = ''
 
-    @setIgnoreLoadRemoteLangs = (langs)->
+    @setIgnoreLoadRemoteLanguages = (langs)->
         ###*
         *   @ngdoc property
-        *   @name ui.gettext.langPicker.$langPicker#setIgnoreLoadRemoteLangs
+        *   @name ui.gettext.langPicker.$langPicker#setIgnoreLoadRemoteLanguages
         *   @methodOf ui.gettext.langPicker.$langPicker
         *   @description
         *        setter for ignoring languages in gettextCatalog.loadRemote
