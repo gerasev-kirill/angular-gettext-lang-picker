@@ -3,6 +3,9 @@
 *   @name ui.gettext.langPicker.$langPicker
 *   @description configuration service
 ###
+LANG_FALLBACK_MAP = {
+    cs: 'cz'
+}
 angular.module('ui.gettext.langPicker')
 
 
@@ -170,6 +173,8 @@ angular.module('ui.gettext.langPicker')
 
         for state in $state.get() when state.$$state
             s = state.$$state()
+            if !s.url
+                continue
             params = s.url.exec(url) or s.url.exec(url.split('?')[0]) or {}
             if params.lang and params.lang in allowedLangs
                 return @setCurrentLanguage(params.lang)
@@ -178,6 +183,8 @@ angular.module('ui.gettext.langPicker')
         languages = window.navigator.languages || [window.navigator.language || window.navigator.userLanguage]
         for l in languages
             l = l.split('-')[0]
+            if LANG_FALLBACK_MAP[l] and LANG_FALLBACK_MAP[l] in allowedLangs
+                return @setCurrentLanguage(LANG_FALLBACK_MAP[l])
             if l in allowedLangs
                 return @setCurrentLanguage(l)
         if defaultLang in allowedLangs

@@ -5,7 +5,6 @@
   "scripts": {
     "grunt": "grunt"
   },
-  "dependencies": {},
   "devDependencies": {
     "angular-template-inline-js": "^0.1.6",
     "grunt": "^1.0.1",
